@@ -1,0 +1,1640 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>⚔️ Guild Manager – RO Origin Classic</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="bg-slate-100">
+
+  <div id="login-container" class="fixed inset-0 bg-slate-900 flex items-center justify-center z-[100]">
+    <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm mx-4">
+      <div class="text-center mb-6">
+        <div
+          class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-3xl shadow-lg mb-4">
+          ⚔️</div>
+        <h1 class="text-2xl font-bold text-slate-800">Guild Manager</h1>
+        <p class="text-slate-500 text-sm mt-1">เข้าสู่ระบบจัดการกิลด์</p>
+      </div>
+      <form onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1">ชื่อผู้ใช้ (Username)</label>
+          <input type="text" id="login-username"
+            class="w-full border border-slate-300 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+            required placeholder="พิมพ์ username">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1">รหัสผ่าน (Password)</label>
+          <input type="password" id="login-password"
+            class="w-full border border-slate-300 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+            required placeholder="พิมพ์รหัสผ่าน">
+        </div>
+        <div class="pt-2">
+          <button type="submit"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-colors shadow-md min-h-[48px]">เข้าสู่ระบบ</button>
+        </div>
+      </form>
+      <div class="mt-6 p-4 bg-slate-50 rounded-xl border border-slate-100 text-xs text-slate-500 text-center space-y-2">
+        <div class="font-semibold text-slate-600">📌 บัญชีทดสอบระบบ</div>
+        <div class="flex justify-between items-center px-2">
+          <span>สมาชิก (Member)</span>
+          <span class="font-mono bg-white px-2 py-0.5 rounded border">user / user</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="app-container" style="display:none">
+    <div id="mobile-bar" class="fixed top-0 left-0 right-0 z-40 bg-slate-900 flex items-center px-4 gap-3 shadow-lg"
+      style="height:56px">
+      <button onclick="toggleSidebar()"
+        class="text-white text-2xl w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors">☰</button>
+      <div
+        class="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-sm shadow">
+        ⚔️</div>
+      <span class="text-white font-bold text-sm flex-1">Guild Manager</span>
+      <span id="mobile-member-count" class="text-xs text-slate-400"></span>
+      <button onclick="toggleDarkMode()" id="dark-btn-mobile"
+        class="text-white text-lg w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors flex-shrink-0"
+        title="Dark mode">🌙</button>
+    </div>
+    <div id="sidebar-backdrop" onclick="closeSidebar()" style="display:none" class="fixed inset-0 bg-black/50 z-30">
+    </div>
+
+    <div id="app-layout" class="flex h-screen overflow-hidden">
+      <div id="sidebar"
+        class="w-56 min-h-screen bg-gradient-to-b from-slate-900 to-blue-950 flex flex-col shadow-2xl flex-shrink-0">
+        <div class="p-4 border-b border-white/10">
+          <div class="flex items-center gap-3">
+            <div
+              class="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-xl shadow-lg">
+              ⚔️</div>
+            <div>
+              <div class="text-white font-bold text-sm leading-tight">Guild Manager</div>
+              <div class="text-blue-400 text-xs">RO Origin Classic</div>
+            </div>
+          </div>
+        </div>
+        <nav class="flex-1 p-2 space-y-0.5 mt-1 overflow-y-auto">
+          <div class="nav-link active" onclick="showView('dashboard')" id="nav-dashboard">
+            <span>🏠</span><span>Dashboard</span></div>
+          <div class="nav-link" onclick="showView('calendar')" id="nav-calendar"><span>📅</span><span>ปฏิทิน
+              Event</span></div>
+          <div class="border-t border-white/5 my-2 mx-1"></div>
+          <div class="text-slate-500 text-xs font-semibold px-3 py-1 uppercase tracking-wide">Guild Events</div>
+          <div class="nav-link" onclick="showView('guild-league')" id="nav-guild-league"><span>⚔️</span><span>Guild
+              League</span></div>
+          <div class="nav-link" onclick="showView('emperium')" id="nav-emperium"><span>🏰</span><span>Emperium
+              Overrun</span></div>
+          <div class="border-t border-white/5 my-2 mx-1"></div>
+          <div class="nav-link" onclick="showView('members')" id="nav-members"><span>👥</span><span>สมาชิก</span></div>
+          <div class="nav-link" onclick="showView('attendance')" id="nav-attendance"><span>📊</span><span>สถิติ</span>
+          </div>
+          <div class="border-t border-white/5 my-2 mx-1" id="nav-divider-settings"></div>
+          <div class="nav-link" onclick="showView('settings')" id="nav-settings"><span>⚙️</span><span>ตั้งค่า</span>
+          </div>
+        </nav>
+        <div class="p-4 border-t border-white/10 bg-black/20">
+          <div class="flex items-center justify-between mb-2">
+            <div class="text-xs text-slate-400 flex flex-col">
+              <span id="current-user-role" class="font-bold text-white capitalize"></span>
+              <span id="sync-status" class="text-[10px] mt-0.5">local data</span>
+            </div>
+            <div class="text-right">
+              <div class="text-white font-bold text-lg leading-none" id="total-members">0</div>
+              <div class="text-[10px] text-slate-400">สมาชิก</div>
+            </div>
+          </div>
+          <button onclick="toggleDarkMode()" id="dark-btn-sidebar"
+            class="w-full py-2.5 mt-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-medium transition-colors min-h-[44px]">🌙
+            Dark mode</button>
+          <a href="https://discord.gg/PzG46fGp7B" target="_blank" rel="noopener noreferrer"
+            class="w-full py-2.5 mt-1 rounded-lg text-sm font-medium transition-colors min-h-[44px] flex items-center justify-center gap-2 text-white"
+            style="background:#5865F2" onmouseover="this.style.background='#4752C4'"
+            onmouseout="this.style.background='#5865F2'"><svg width="18" height="14" viewBox="0 0 71 55"
+              fill="currentColor">
+              <path
+                d="M60.1 4.9A58.5 58.5 0 0045.4.2a.2.2 0 00-.2.1 40.8 40.8 0 00-1.8 3.7 54 54 0 00-16.2 0A37.3 37.3 0 0025.4.3a.2.2 0 00-.2-.1A58.4 58.4 0 0010.5 4.9a.2.2 0 00-.1.1C1.5 18.7-.9 32.2.3 45.5v.2a58.9 58.9 0 0017.7 9a.2.2 0 00.3-.1 42.1 42.1 0 003.6-5.9.2.2 0 00-.1-.3 38.8 38.8 0 01-5.5-2.7.2.2 0 01 0-.4l1.1-.9a.2.2 0 01.2 0 42 42 0 0035.6 0 .2.2 0 01.2 0l1.1.9a.2.2 0 010 .3 36.4 36.4 0 01-5.5 2.7.2.2 0 00-.1.4 47.2 47.2 0 003.6 5.9.2.2 0 00.3 0A58.7 58.7 0 0070.4 45.7v-.1C72 30.1 68 16.7 60.2 5a.2.2 0 00-.1-.1zM23.7 37.3c-3.5 0-6.4-3.2-6.4-7.2s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 4-2.9 7.2-6.4 7.2zm23.6 0c-3.5 0-6.4-3.2-6.4-7.2s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 4-2.8 7.2-6.4 7.2z" />
+            </svg> Discord กิล</a>
+          <button onclick="logout()"
+            class="w-full py-2.5 mt-1 bg-white/10 hover:bg-red-500/80 text-white rounded-lg text-sm font-medium transition-colors min-h-[44px]">🚪
+            ออกจากระบบ</button>
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-auto" id="main-content"></div>
+    </div>
+  </div>
+
+  <div id="modal-overlay" style="display:none" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center"
+    onclick="closeModal(event)">
+    <div id="modal-content" class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 max-h-[85vh] overflow-auto"
+      onclick="event.stopPropagation()"></div>
+  </div>
+
+  <div id="toast" style="opacity:0;display:none"
+    class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-5 py-2.5 rounded-full shadow-xl text-sm font-medium z-50">
+  </div>
+
+  <script>
+    // ============================================================
+    // DEFAULT MEMBER DATA
+    // ============================================================
+    const MEMBERS_DEFAULT = []; // ปล่อยว่างไว้เพื่อเริ่มต้นกิลด์ใหม่
+
+    const JOB_INFO = {
+      "Lord Knight": { role: "tank", color: "#7f1d1d", bg: "#fee2e2", emoji: "⚔️", icon: "job_icon/Lord Knight.jpg" },
+      "Paladin": { role: "tank", color: "#1e3a8a", bg: "#dbeafe", emoji: "🛡️", icon: "job_icon/Paladin.jpg" },
+      "Mastersmith": { role: "tank", color: "#78350f", bg: "#fef9c3", emoji: "🔨", icon: "job_icon/Mastersmith.jpg" },
+      "Stalker": { role: "dps", color: "#5b21b6", bg: "#ede9fe", emoji: "🗡️", icon: "job_icon/Stalker.jpg" },
+      "Sniper": { role: "dps", color: "#14532d", bg: "#dcfce7", emoji: "🏹", icon: "job_icon/Sniper.jpg" },
+      "High Wizard": { role: "dps", color: "#4c1d95", bg: "#ede9fe", emoji: "🔮", icon: "job_icon/High Wizard.jpg" },
+      "High Priest": { role: "healer", color: "#065f46", bg: "#d1fae5", emoji: "✝️", icon: "job_icon/High Priest.jpg" },
+      "Champion": { role: "dps", color: "#b91c1c", bg: "#fef2f2", emoji: "👊", icon: "job_icon/Champion.jpg" },
+      "Professor": { role: "support", color: "#164e63", bg: "#cffafe", emoji: "📚", icon: "job_icon/Professor.jpg" },
+      "Gypsy": { role: "support", color: "#701a75", bg: "#fae8ff", emoji: "💃", icon: "job_icon/Gypsy_Minstrel.jpg" },
+      "Biochemist": { role: "support", color: "#92400e", bg: "#fef3c7", emoji: "⚗️", icon: "job_icon/Biochemist.jpg" },
+      "Summoner": { role: "support", color: "#065f46", bg: "#ecfdf5", emoji: "🐾", icon: "job_icon/Summoner.jpg" },
+      "Assassin Cross": { role: "dps", color: "#5b21b6", bg: "#ede9fe", emoji: "🗡️", icon: "job_icon/Assasin Cross.jpg" },
+      "Minstrel": { role: "support", color: "#9a3412", bg: "#ffedd5", emoji: "🎵", icon: "job_icon/Gypsy_Minstrel.jpg" },
+    };
+    const ROLE_LABEL = { dps: "DPS", healer: "Healer", support: "Support", tank: "Tank" };
+    const ROLE_COLOR = { dps: "bg-purple-100 text-purple-700", healer: "bg-green-100 text-green-700", support: "bg-amber-100 text-amber-700", tank: "bg-red-100 text-red-700" };
+    const DAYS_TH = ["อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัส", "ศุกร์", "เสาร์"];
+    const DAYS_SHORT = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+    const WEEKLY_EVENTS = [
+      { id: "extreme_mon", name: "Extreme Challenge", day: 1, time: "00:00", type: "other", color: "#6366f1", icon: "💪" },
+      { id: "dim_drill_mon", name: "Dimension Drill", day: 1, time: "19:55", type: "other", color: "#8b5cf6", icon: "🌀" },
+      { id: "guild_league_tue", name: "Guild League", day: 2, time: "19:55", type: "guild_league", color: "#ef4444", icon: "⚔️" },
+      { id: "dim_drill_wed", name: "Dimension Drill", day: 3, time: "19:55", type: "other", color: "#8b5cf6", icon: "🌀" },
+      { id: "guild_league_thu", name: "Guild League", day: 4, time: "19:55", type: "guild_league", color: "#ef4444", icon: "⚔️" },
+      { id: "guild_league_sat", name: "Guild League", day: 6, time: "19:55", type: "guild_league", color: "#ef4444", icon: "⚔️" },
+      { id: "themed_party_sun", name: "Themed Party", day: 0, time: "19:30", type: "other", color: "#ec4899", icon: "🎉" },
+      { id: "emperium_sun", name: "Emperium Overrun", day: 0, time: "19:55", type: "emperium", color: "#f59e0b", icon: "🏰" },
+    ];
+
+    const GUILD_ROLE_STYLE = {
+      "Guild Master": "bg-yellow-100 text-yellow-800 border border-yellow-300",
+      "Vice Guild Master": "bg-orange-100 text-orange-800 border border-orange-300",
+      "Commander": "bg-sky-100 text-sky-800 border border-sky-300",
+      "Officer": "bg-green-100 text-green-800 border border-green-300",
+      "Charisma Baby": "bg-fuchsia-100 text-fuchsia-800 border border-fuchsia-300",
+      "Member": "bg-slate-100 text-slate-500",
+    };
+
+    // ============================================================
+    // STATE & LOGIN & AUTO-SAVE SETUP
+    // ============================================================
+    let state = {
+      currentView: "dashboard",
+      signups: {}, glParties: {}, empParties: {},
+      members: null,
+      lastSync: null,
+      userRole: null
+    };
+
+    // 🟢 ใส่ URL ที่คัดลอกมาจาก Apps Script ตรงนี้
+    const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxRjBHlUhx8e6VmpR0sIOlXoHwUnHA-s3I9Chn8Hb5kKvmwGFrlC_NjM8KLwc9-7Upn/exec";
+
+    function loadState() {
+      try {
+        const s = localStorage.getItem("ro_gm_v3");
+        if (s) {
+          const parsed = JSON.parse(s);
+          delete parsed.userRole;
+          state = Object.assign(state, parsed);
+        }
+      } catch (e) { }
+    }
+
+    function saveState() {
+      try {
+        const copy = { ...state };
+        delete copy.userRole;
+
+        // เซฟลงเครื่อง 
+        localStorage.setItem("ro_gm_v3", JSON.stringify(copy));
+
+        // ยิงข้อมูลไปเซฟที่ Google Sheets (อนุญาตให้ User ทำงานนี้ได้เพื่อให้ซิงค์ปาร์ตี้อัตโนมัติ)
+        if (APP_SCRIPT_URL && APP_SCRIPT_URL !== "วาง_URL_ของ_APPS_SCRIPT_ที่นี่") {
+          document.getElementById('sync-status').textContent = 'กำลังบันทึกออนไลน์...';
+          document.getElementById('sync-status').className = 'text-[10px] mt-0.5 text-yellow-400';
+
+          fetch(APP_SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(copy)
+          }).then(() => {
+            document.getElementById('sync-status').textContent = 'บันทึกออนไลน์ล่าสุดแล้ว';
+            document.getElementById('sync-status').className = 'text-[10px] mt-0.5 text-green-400';
+          }).catch(e => {
+            document.getElementById('sync-status').textContent = '❌ เซฟออนไลน์ล้มเหลว';
+            document.getElementById('sync-status').className = 'text-[10px] mt-0.5 text-red-400';
+          });
+        }
+      } catch (e) { }
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const u = document.getElementById('login-username').value.trim().toLowerCase();
+      const p = document.getElementById('login-password').value;
+
+      if (u === 'admin' && p === '7878') {
+        state.userRole = 'admin';
+        sessionStorage.setItem('ro_gm_session', 'admin');
+        startApp(false);
+      } else if (u === 'user' && p === 'user') {
+        state.userRole = 'member';
+        sessionStorage.setItem('ro_gm_session', 'member');
+        startApp(false);
+      } else {
+        showToast("❌ ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
+      }
+    }
+
+    function startApp(isAutoLogin = false) {
+      document.getElementById('login-container').style.display = 'none';
+      document.getElementById('app-container').style.display = 'block';
+
+      document.getElementById('current-user-role').textContent = state.userRole === 'admin' ? '👑 ผู้ดูแลระบบ' : '👥 สมาชิกทั่วไป';
+
+      const navSettings = document.getElementById('nav-settings');
+      const navDivider = document.getElementById('nav-divider-settings');
+      if (state.userRole === 'member') {
+        navSettings.style.display = 'none';
+        navDivider.style.display = 'none';
+      } else {
+        navSettings.style.display = 'flex';
+        navDivider.style.display = 'block';
+      }
+
+      if (!isAutoLogin) state.currentView = 'dashboard';
+
+      showToast(`ยินดีต้อนรับ! เข้าสู่ระบบในสถานะ ${state.userRole}`);
+      updateDarkBtns();
+      showView(state.currentView);
+
+      // Auto-sync ตอนเริ่มแอปถ้ามี URL (โหลดข้อมูลล่าสุดเสมอ)
+      if (APP_SCRIPT_URL !== "วาง_URL_ของ_APPS_SCRIPT_ที่นี่") {
+        syncFromSheets();
+      }
+    }
+
+    function logout() {
+      state.userRole = null;
+      sessionStorage.removeItem('ro_gm_session');
+      document.getElementById('login-container').style.display = 'flex';
+      document.getElementById('app-container').style.display = 'none';
+      document.getElementById('login-username').value = '';
+      document.getElementById('login-password').value = '';
+    }
+
+    // ============================================================
+    // DARK MODE
+    // ============================================================
+    function toggleDarkMode() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('darkMode', isDark ? '1' : '0');
+      updateDarkBtns();
+    }
+    function updateDarkBtns() {
+      const isDark = document.documentElement.classList.contains('dark');
+      const label = isDark ? '☀️ Light mode' : '🌙 Dark mode';
+      const icon = isDark ? '☀️' : '🌙';
+      const sb = document.getElementById('dark-btn-sidebar');
+      const mb = document.getElementById('dark-btn-mobile');
+      if (sb) { sb.textContent = label; }
+      if (mb) { mb.textContent = icon; mb.title = isDark ? 'Light mode' : 'Dark mode'; }
+    }
+    (function () {
+      if (localStorage.getItem('darkMode') === '1') {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+
+    function getMembers() {
+      const raw = state.members || MEMBERS_DEFAULT;
+      return raw.map((m, i) => ({ ...m, id: i + 1 }));
+    }
+
+    // ============================================================
+    // HELPERS
+    // ============================================================
+    const getMember = id => getMembers().find(m => m.id === id);
+    const getJobInfo = job => JOB_INFO[job] || { role: "other", color: "#64748b", bg: "#f1f5f9", emoji: "❓", icon: "" };
+    function jobIcon(job, size = '20px', cls = '') {
+      const ji = getJobInfo(job);
+      if (ji.icon) return `<img src="${ji.icon}" alt="${job}" class="job-icon ${cls}" style="width:${size};height:${size};border-radius:50%;object-fit:cover;">`;
+      return `<span style="font-size:${size};line-height:1">${ji.emoji}</span>`;
+    }
+    const getSignup = (eid, mid) => (state.signups[eid] || {})[mid] || "maybe";
+    function setSignup(eid, mid, status) { if (!state.signups[eid]) state.signups[eid] = {}; state.signups[eid][mid] = status; saveState(); }
+    function getAttending(eid) { return getMembers().filter(m => getSignup(eid, m.id) === "yes"); }
+
+    function getGLData(eid) {
+      if (!state.glParties[eid]) state.glParties[eid] = { elite: Array.from({ length: 8 }, () => []), secondary: [] };
+      return state.glParties[eid];
+    }
+    function getEmpData(eid) {
+      if (!state.empParties[eid]) state.empParties[eid] = [];
+      return state.empParties[eid];
+    }
+
+    function nextOccurrence(day, time) {
+      const now = new Date(), [h, m] = time.split(":").map(Number);
+      let d = new Date(now); d.setHours(h, m, 0, 0);
+      let diff = day - now.getDay(); if (diff < 0) diff += 7; if (diff === 0 && d <= now) diff = 7;
+      d.setDate(d.getDate() + diff); return d;
+    }
+    function timeUntil(date) {
+      const ms = date - new Date(); if (ms < 0) return "กำลังจะเริ่ม";
+      const h = Math.floor(ms / 3600000), mn = Math.floor((ms % 3600000) / 60000);
+      if (h > 48) return `${Math.floor(h / 24)} วัน`; if (h > 0) return `${h} ชม. ${mn} นาที`; return `${mn} นาที`;
+    }
+
+    function durationInGuild(joinDateStr) {
+      if (!joinDateStr || joinDateStr === "2024-01-01") return null;
+      const join = new Date(joinDateStr), now = new Date();
+      let years = now.getFullYear() - join.getFullYear();
+      let months = now.getMonth() - join.getMonth();
+      let days = now.getDate() - join.getDate();
+      if (days < 0) { months--; const prev = new Date(now.getFullYear(), now.getMonth(), 0); days += prev.getDate(); }
+      if (months < 0) { years--; months += 12; }
+      const totalDays = Math.floor((now - join) / 86400000);
+      if (totalDays < 0) return "ยังไม่ถึงวันเข้ากิล";
+      if (totalDays < 30) return `${totalDays} วัน`;
+      if (years === 0) return months > 0 ? `${months} เดือน ${days} วัน` : `${days} วัน`;
+      return months > 0 ? `${years} ปี ${months} เดือน` : `${years} ปี`;
+    }
+
+    function isNewMember(joinDateStr) {
+      if (!joinDateStr) return false;
+      const diff = (new Date() - new Date(joinDateStr)) / 86400000;
+      return diff >= 0 && diff <= 1;
+    }
+
+    function memberChip(m, onclick = "", extra = "") {
+      const ji = getJobInfo(m.job);
+      return `<span class="member-chip" style="background:${ji.bg};color:${ji.color}" ${onclick ? `onclick="${onclick}"` : ""}${extra}>${jobIcon(m.job, '16px')} ${m.name}</span>`;
+    }
+
+    // ============================================================
+    // GOOGLE APPS SCRIPT SYNC
+    // ============================================================
+    async function syncFromSheets() {
+      if (!APP_SCRIPT_URL || APP_SCRIPT_URL === "วาง_URL_ของ_APPS_SCRIPT_ที่นี่") {
+        showToast("⚠️ กรุณาใส่ URL ของ Apps Script ในโค้ดก่อน");
+        return;
+      }
+
+      const btn = document.getElementById('sync-btn');
+      if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spin inline-block">⏳</span> กำลังโหลด...'; }
+      document.getElementById('sync-status').textContent = 'กำลังดึงข้อมูล...';
+
+      try {
+        const res = await fetch(APP_SCRIPT_URL);
+        const data = await res.json();
+
+        if (data.members && data.members.length > 0) {
+          state.members = data.members;
+          state.signups = Object.keys(data.signups).length ? data.signups : state.signups;
+          state.glParties = Object.keys(data.glParties).length ? data.glParties : state.glParties;
+          state.empParties = Object.keys(data.empParties).length ? data.empParties : state.empParties;
+          state.lastSync = new Date().toISOString();
+
+          const copy = { ...state }; delete copy.userRole;
+          localStorage.setItem("ro_gm_v3", JSON.stringify(copy));
+
+          updateSyncStatus();
+          document.getElementById('total-members').textContent = getMembers().length;
+          showToast(`✅ ซิงค์ข้อมูลล่าสุดสำเร็จ!`);
+          rerender();
+        } else {
+          throw new Error("ยังไม่มีข้อมูลในระบบ");
+        }
+      } catch (e) {
+        console.error(e);
+        showToast(`❌ ซิงค์ข้อมูลล้มเหลว หรือยังไม่มีข้อมูล`);
+        document.getElementById('sync-status').textContent = 'sync failed';
+      } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = '🔄 โหลดข้อมูลจากคลาวด์'; }
+      }
+    }
+
+    function updateSyncStatus() {
+      const el = document.getElementById('sync-status');
+      if (!el) return;
+      if (state.lastSync) {
+        const d = new Date(state.lastSync);
+        el.textContent = `synced ${d.toLocaleDateString('th-TH')}`;
+        el.className = 'text-[10px] mt-0.5 text-green-400';
+      } else {
+        el.textContent = 'local data'; el.className = 'text-[10px] mt-0.5 text-slate-500';
+      }
+    }
+
+    // ============================================================
+    // RENDER: DASHBOARD
+    // ============================================================
+    function renderDashboard() {
+      const now = new Date(), todayDow = now.getDay();
+      const MEMBERS = getMembers();
+      const todayEvts = WEEKLY_EVENTS.filter(e => e.day === todayDow);
+      const upcoming = WEEKLY_EVENTS.map(e => ({ ...e, next: nextOccurrence(e.day, e.time) })).sort((a, b) => a.next - b.next).slice(0, 5);
+      const jobCount = MEMBERS.reduce((a, m) => { a[m.job] = (a[m.job] || 0) + 1; return a }, {});
+      const newMembers = MEMBERS.filter(m => isNewMember(m.joinDate));
+
+      return `
+<div class="p-4 md:p-6 w-full space-y-4 md:space-y-5">
+  <div class="flex items-start justify-between flex-wrap gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-800">Dashboard</h1>
+      <p class="text-slate-400 text-sm mt-0.5">วัน${DAYS_TH[todayDow]} · ${now.toLocaleDateString('th-TH', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+    </div>
+    <div class="flex gap-3 flex-wrap">
+      ${[
+          { n: MEMBERS.length, label: "สมาชิก", color: "text-blue-600" },
+          { n: newMembers.length, label: "สมาชิกใหม่ (24 ชม.)", color: "text-green-600" },
+          { n: 3, label: "GL/สัปดาห์", color: "text-red-500" },
+        ].map(s => `<div class="card px-4 py-3 text-center min-w-[90px]">
+        <div class="text-2xl font-bold ${s.color}">${s.n}</div>
+        <div class="text-xs text-slate-400 leading-tight mt-0.5">${s.label}</div>
+      </div>`).join('')}
+    </div>
+  </div>
+
+  ${todayEvts.length ? `
+  <div class="card p-5">
+    <h2 class="font-bold text-slate-600 mb-3 flex items-center gap-2 text-xs uppercase tracking-wider">📅 Event วันนี้</h2>
+    <div class="flex flex-wrap gap-3">
+      ${todayEvts.map(e => `
+      <div class="flex items-center gap-3 px-4 py-3 rounded-xl border-2 cursor-pointer hover:shadow-md transition-all select-none"
+           style="border-color:${e.color};background:${e.color}12"
+           onclick="${e.type === 'guild_league' ? `glEv='${e.id}'; showView('guild-league')` : e.type === 'emperium' ? `empEv='${e.id}'; showView('emperium')` : ""}">
+        <span class="text-2xl">${e.icon}</span>
+        <div>
+          <div class="font-semibold text-sm" style="color:${e.color}">${e.name}</div>
+          <div class="text-xs text-slate-400">${e.time} น. · ${timeUntil(nextOccurrence(e.day, e.time))}</div>
+        </div>
+      </div>`).join('')}
+    </div>
+  </div>`: ''}
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+    <div class="card p-5">
+      <h2 class="font-bold text-slate-600 mb-3 text-xs uppercase tracking-wider">⏰ Event ที่กำลังจะมาถึง</h2>
+      <div class="space-y-2">
+        ${upcoming.map(e => {
+          const att = getAttending(e.id).length;
+          return `<div class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 cursor-pointer transition-all"
+               onclick="${e.type === 'guild_league' ? `glEv='${e.id}'; showView('guild-league')` : e.type === 'emperium' ? `empEv='${e.id}'; showView('emperium')` : ""}">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center text-lg flex-shrink-0" style="background:${e.color}20">${e.icon}</div>
+            <div class="flex-1 min-w-0">
+              <div class="font-medium text-slate-700 text-sm">${e.name}</div>
+              <div class="text-xs text-slate-400">วัน${DAYS_TH[e.day]} · ${e.time} น.</div>
+            </div>
+            <div class="text-right flex-shrink-0">
+              <div class="text-sm font-semibold" style="color:${e.color}">${timeUntil(e.next)}</div>
+              ${att > 0 ? `<div class="text-xs text-slate-400">${att} คน</div>` : ''}
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+
+    <div class="card p-5">
+      <h2 class="font-bold text-slate-600 mb-3 text-xs uppercase tracking-wider">📊 อาชีพในกิล</h2>
+      <div class="grid grid-cols-2 gap-2">
+        ${Object.entries(jobCount).sort((a, b) => b[1] - a[1]).map(([job, n]) => {
+          const ji = getJobInfo(job);
+          return `<div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background:${ji.bg}">
+            ${jobIcon(job, '24px')}
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-semibold truncate" style="color:${ji.color}">${job}</div>
+            </div>
+            <span class="text-sm font-bold" style="color:${ji.color}">${n}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  </div>
+
+  ${newMembers.length ? `
+  <div class="card p-5">
+    <h2 class="font-bold text-slate-600 mb-3 text-xs uppercase tracking-wider">🌟 สมาชิกใหม่ (เข้ากิลภายใน 24 ชม.)</h2>
+    <div class="flex flex-wrap gap-2">
+      ${newMembers.map(m => {
+          const ji = getJobInfo(m.job);
+          return `<div class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm" style="background:${ji.bg}">
+          ${jobIcon(m.job, '18px')}
+          <span class="font-medium" style="color:${ji.color}">${m.name}</span>
+          <span class="text-xs text-slate-400">${durationInGuild(m.joinDate)}</span>
+        </div>`;
+        }).join('')}
+    </div>
+  </div>`: ''}
+</div>`;
+    }
+
+    // ============================================================
+    // RENDER: CALENDAR
+    // ============================================================
+    function renderCalendar() {
+      const todayDow = new Date().getDay();
+      const colOrder = [1, 2, 3, 4, 5, 6, 0];
+      const colLabel = ["จันทร์", "อังคาร", "พุธ", "พฤหัส", "ศุกร์", "เสาร์", "อาทิตย์"];
+      return `
+<div class="p-4 md:p-6 space-y-4 md:space-y-5">
+  <h1 class="text-2xl font-bold text-slate-800">📅 ปฏิทิน Event ประจำสัปดาห์</h1>
+  <div class="card overflow-hidden overflow-x-auto">
+  <div style="min-width:560px">
+    <div class="grid grid-cols-7 bg-blue-700">
+      ${colOrder.map((dow, i) => {
+        const t = dow === todayDow; return `<div class="py-3 text-center border-r border-blue-600 last:border-0 ${t ? 'bg-blue-500' : ''}">
+        <div class="text-white font-semibold text-sm">${colLabel[i]}</div>
+        ${t ? '<div class="text-blue-200 text-xs">วันนี้</div>' : ''}
+      </div>`;
+      }).join('')}
+    </div>
+    <div class="grid grid-cols-7 divide-x divide-slate-100" style="min-height:300px">
+      ${colOrder.map(dow => {
+        const evts = WEEKLY_EVENTS.filter(e => e.day === dow), t = dow === todayDow;
+        return `<div class="p-2 space-y-2 ${t ? 'bg-blue-50' : ''}">
+          ${evts.length === 0 ? '<div class="text-slate-200 text-xs text-center mt-10">—</div>' : ''}
+          ${evts.map(e => {
+          const att = getAttending(e.id).length, cl = e.type === 'guild_league' || e.type === 'emperium';
+          return `<div class="rounded-lg p-2 text-white ${cl ? 'cursor-pointer hover:opacity-90 transition-opacity' : ''}"
+                 style="background:${e.color}" ${cl ? `onclick="${e.type === 'guild_league' ? `glEv='${e.id}'; showView('guild-league')` : `empEv='${e.id}'; showView('emperium')`}"` : ""}>
+              <div class="flex items-center gap-1 text-xs font-semibold">${e.icon} ${e.name}</div>
+              <div class="text-xs opacity-75">${e.time} น.</div>
+              ${att > 0 ? `<div class="text-xs opacity-80 mt-0.5">👥 ${att}</div>` : ''}
+            </div>`;
+        }).join('')}
+        </div>`;
+      }).join('')}
+    </div>
+  </div></div>
+  </div>
+</div>`;
+    }
+
+    // ============================================================
+    // RENDER: GUILD LEAGUE
+    // ============================================================
+    let glEv = "guild_league_tue";
+
+    function renderGuildLeague() {
+      const MEMBERS = getMembers();
+      const glEvts = WEEKLY_EVENTS.filter(e => e.type === "guild_league");
+      const ev = WEEKLY_EVENTS.find(e => e.id === glEv);
+      const data = getGLData(glEv);
+      const attending = getAttending(glEv);
+      const assignedIds = new Set([...data.elite.flat(), ...data.secondary]);
+      const unassigned = attending.filter(m => !assignedIds.has(m.id));
+      const totalElite = data.elite.reduce((s, p) => s + p.length, 0);
+      const gl_sf = (window._gl_sf || '').toLowerCase();
+      const gl_jf = window._gl_jf || '';
+      const glJobs = [...new Set(MEMBERS.map(m => m.job))].sort();
+      const glFiltered = MEMBERS.filter(m => (!gl_jf || m.job === gl_jf) && (!gl_sf || m.name.toLowerCase().includes(gl_sf) || m.job.toLowerCase().includes(gl_sf)));
+
+      return `
+<div class="p-4 md:p-6 w-full space-y-4 md:space-y-5">
+  <div class="flex items-center justify-between flex-wrap gap-3">
+    <h1 class="text-2xl font-bold text-slate-800">⚔️ Guild League</h1>
+    <div class="flex gap-1.5">
+      ${glEvts.map(e => `<button class="tab-btn ${e.id === glEv ? 'active' : ''}" onclick="glEv='${e.id}';rerender()">
+        ${e.icon} ${DAYS_SHORT[e.day]}
+      </button>`).join('')}
+    </div>
+  </div>
+
+  <div class="card p-5">
+    <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+      <h2 class="font-bold text-slate-700 flex items-center gap-2">📋 เช็คชื่อ</h2>
+      <div class="flex items-center gap-4 text-xs flex-wrap">
+        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-green-500 inline-block"></span>เข้าร่วม <strong>${attending.length}</strong></span>
+        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-red-400 inline-block"></span>ไม่เข้า <strong>${MEMBERS.filter(m => getSignup(glEv, m.id) === 'no').length}</strong></span>
+        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-slate-300 inline-block"></span>ยังไม่ตอบ <strong>${MEMBERS.filter(m => getSignup(glEv, m.id) === 'maybe').length}</strong></span>
+      </div>
+    </div>
+    <div class="mb-2 flex flex-wrap gap-2 items-center">
+      <input type="text" placeholder="🔍 ค้นหาชื่อหรืออาชีพ..." value="${window._gl_sf || ''}"
+        data-role="gl-search"
+        class="border border-slate-200 rounded-lg px-3 py-2 text-sm flex-1 min-w-44 outline-none focus:ring-2 focus:ring-blue-300"
+        oninput="window._gl_sf=this.value;rerender()">
+      <div class="flex flex-wrap gap-1">
+        <button class="tab-btn text-xs ${!gl_jf ? 'active' : ''}" onclick="window._gl_jf='';rerender()">ทั้งหมด</button>
+        ${glJobs.map(j => { return `<button class="tab-btn text-xs ${gl_jf === j ? 'active' : ''}" onclick="window._gl_jf='${j}';rerender()">${jobIcon(j, '16px')} ${j}</button>`; }).join('')}
+      </div>
+    </div>
+    <div class="checkin-grid grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2.5 max-h-80 overflow-y-auto pr-1" style="-webkit-overflow-scrolling:touch">
+      ${glFiltered.map(m => {
+        const ji = getJobInfo(m.job);
+        const partyIdx = data.elite.findIndex(p => p.includes(m.id));
+        const inSec = data.secondary.includes(m.id);
+        const status = getSignup(glEv, m.id);
+        const ring = partyIdx >= 0 ? 'ring-2 ring-blue-400 bg-blue-50' : inSec ? 'ring-2 ring-orange-300 bg-orange-50' : status === 'no' ? 'opacity-40 bg-slate-50 border border-slate-200' : 'bg-white border border-slate-200 hover:border-blue-300';
+        const badge = partyIdx >= 0 ? `<span class="text-xs bg-blue-500 text-white px-1.5 py-0.5 rounded-md font-bold leading-none">P${partyIdx + 1}</span>` : inSec ? `<span class="text-xs bg-orange-400 text-white px-1.5 py-0.5 rounded-md font-bold leading-none">Sec</span>` : '';
+
+        const placed = partyIdx >= 0 || inSec;
+        return `<div class="checkin-card flex items-center gap-2.5 p-3 rounded-xl ${ring} cursor-pointer transition-all select-none"
+          onclick="clickCheckinGL(event,${m.id})"
+          draggable="true" ondragstart="startDragFromCheckin(event,${m.id},'gl')" ondragend="endDrag(event)" ontouchstart="touchStartDrag(event,${m.id},'gl',true)"
+          title="${placed ? 'คลิกเพื่อนำออกจากปาร์ตี้' : 'ลากใส่ปาร์ตี้ หรือคลิกเพื่อเช็คชื่อ'}">
+          <span class="flex-shrink-0">${jobIcon(m.job, '24px')}</span>
+          <div class="flex-1 min-w-0">
+            <div class="text-xs font-semibold truncate">${m.name}</div>
+            <div class="job-label text-xs opacity-60 truncate" style="color:${ji.color}">${m.job}</div>
+          </div>
+          <span class="flex-shrink-0 text-sm">${badge || (status === 'yes' ? '✅' : status === 'no' ? '❌' : '')}</span>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="text-xs text-slate-400 text-center mt-2">
+      🖱️ <strong>ลากใส่ปาร์ตี้</strong> หรือแตะชื่อ — ถ้าอยู่ปาร์ตี้แล้ว <strong>แตะเพื่อนำออก</strong>
+    </div>
+  </div>
+
+  <div class="card p-5">
+    <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+      <h2 class="font-bold text-slate-700">⚔️ จัดปาร์ตี้ Elite Field</h2>
+      <div class="flex flex-wrap gap-2">
+        <button onclick="autoAssignGL()" class="px-3 py-1.5 bg-blue-500 text-white rounded-lg text-xs font-semibold hover:bg-blue-600 transition-colors">🔀 Auto จัดปาร์ตี้</button>
+        <button onclick="clearGL()" class="px-3 py-1.5 bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold hover:bg-slate-300 transition-colors">🗑️ ล้าง</button>
+        <button onclick="copyGL()" class="px-3 py-1.5 bg-green-500 text-white rounded-lg text-xs font-semibold hover:bg-green-600 transition-colors">📋 Copy</button>
+      </div>
+    </div>
+    <div class="flex flex-wrap items-center gap-2 mb-3 text-xs">
+      <span class="px-3 py-1 rounded-full bg-red-100 text-red-700 font-semibold">Elite: ${totalElite}/40</span>
+      <span class="px-3 py-1 rounded-full bg-orange-100 text-orange-700 font-semibold">Secondary: ${data.secondary.length} คน</span>
+      ${unassigned.length ? `<span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 font-semibold">ยังไม่ได้จัด: ${unassigned.length} คน</span>` : ''}
+    </div>
+    ${(unassigned.length) ? `
+    <div class="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-xl">
+      <div class="text-xs font-semibold text-yellow-700 mb-2">รอจัดปาร์ตี้ · <span class="font-normal">ลากใส่ปาร์ตี้ หรือคลิกเพื่อเลือกสนาม</span></div>
+      <div class="flex flex-wrap gap-1.5">${unassigned.map(m => memberChip(m, `openMemberModal('${glEv}',${m.id},null)`, ` draggable="true" ondragstart="startDragGL(event,${m.id})" ondragend="endDrag(event)"`)).join('')}</div>
+      <button onclick="moveAllSecondary()" class="mt-2 text-xs text-orange-600 hover:text-orange-800 font-medium">→ ย้ายทั้งหมดไป Secondary</button>
+    </div>`: ''}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      ${data.elite.map((party, pi) => {
+        const full = party.length >= 5;
+        return `<div class="party-box ${full ? 'full' : ''}" data-drop="elite" data-pi="${pi}"
+          ondragover="event.preventDefault()" ondragenter="event.preventDefault();this.classList.add('drag-over')" ondragleave="if(!this.contains(event.relatedTarget))this.classList.remove('drag-over')" ondrop="dropToElite(event,${pi},this)">
+          <div class="flex items-center justify-between mb-2">
+            <span class="font-bold text-xs text-slate-600">ปาร์ตี้ ${pi + 1}</span>
+            <span class="text-xs px-1.5 py-0.5 rounded-full ${full ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500'}">${party.length}/5</span>
+          </div>
+          ${(party.length === 0) ? '<div class="text-slate-300 text-xs text-center mt-4 pointer-events-none">↓ ลากสมาชิกมาวางที่นี่</div>' : ''}
+          <div class="space-y-1">
+            ${party.map(mid => {
+          const m = getMember(mid); if (!m) return '';
+          const ji = getJobInfo(m.job);
+          return `<div class="party-member flex items-center gap-2 text-xs p-2.5 rounded-xl transition-opacity" style="background:${ji.bg};cursor:grab"
+                draggable="true" ondragstart="if(event.target.closest('button')){event.preventDefault();return;}startDragGL(event,${mid})" ondragend="endDrag(event)" ontouchstart="if(!event.target.closest('button'))touchStartDrag(event,${mid},'gl',false)">
+                <span class="text-slate-300 text-xs leading-none select-none">⠿</span>
+                ${jobIcon(m.job, '18px')}
+                <span class="pmt flex-1 font-medium truncate" style="color:${ji.color}">${m.name}</span>
+                <button onclick="event.stopPropagation();removeElite(${pi},${mid})" class="text-slate-300 hover:text-red-400 transition-colors leading-none p-1.5 -mr-1" style="min-width:32px;min-height:32px;display:flex;align-items:center;justify-content:center">✕</button>
+              </div>`;
+        }).join('')}
+          </div>
+          ${(!full) ? `<button onclick="openPartyModal(${pi})" class="mt-2 w-full text-xs text-slate-400 hover:text-blue-500 py-1 border border-dashed border-slate-200 hover:border-blue-300 rounded-lg transition-colors">+ เพิ่ม</button>` : ''}
+        </div>`;
+      }).join('')}
+    </div>
+  </div>
+
+  <div class="card p-5">
+    <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+      <h2 class="font-bold text-slate-700">🛡️ Secondary Field <span class="text-sm font-normal text-slate-400">(${data.secondary.length} คน)</span></h2>
+    </div>
+    <div class="rounded-xl transition-all min-h-[56px]" data-drop="secondary"
+      ondragover="event.preventDefault()" ondragenter="event.preventDefault();this.classList.add('drag-over')" ondragleave="if(!this.contains(event.relatedTarget))this.classList.remove('drag-over')" ondrop="dropToSecondaryZone(event,this)"
+      style="border:2px dashed #e2e8f0;padding:10px">
+      ${data.secondary.length === 0
+          ? `<div class="text-center text-slate-300 text-sm py-2 pointer-events-none">↓ ลากสมาชิกมาวาง Secondary</div>`
+          : `<div class="flex flex-wrap gap-2">
+          ${data.secondary.map(mid => {
+            const m = getMember(mid); if (!m) return '';
+            const ji = getJobInfo(m.job);
+            return `<div class="party-member flex items-center gap-2 text-sm px-3 py-2.5 rounded-xl transition-opacity" style="background:${ji.bg};cursor:grab"
+              draggable="true" ondragstart="if(event.target.closest('button')){event.preventDefault();return;}startDragGL(event,${mid})" ondragend="endDrag(event)" ontouchstart="if(!event.target.closest('button'))touchStartDrag(event,${mid},'gl',false)">
+              ${jobIcon(m.job, '18px')}<span class="pmt font-medium" style="color:${ji.color}">${m.name}</span>
+              <button onclick="event.stopPropagation();removeSecondary(${mid})" class="text-slate-300 hover:text-red-400 transition-colors text-xs ml-1 p-1.5" style="min-width:32px;min-height:32px;display:flex;align-items:center;justify-content:center">✕</button>
+            </div>`;
+          }).join('')}
+        </div>`}
+    </div>
+  </div>
+</div>`;
+    }
+
+    // ============================================================
+    // RENDER: EMPERIUM OVERRUN
+    // ============================================================
+    let empEv = "emperium_sun";
+
+    function renderEmperium() {
+      const MEMBERS = getMembers();
+      const ev = WEEKLY_EVENTS.find(e => e.id === empEv);
+      const attending = getAttending(empEv);
+      const parties = getEmpData(empEv);
+      const assignedIds = new Set(parties.flatMap(p => p.members));
+      const unassigned = attending.filter(m => !assignedIds.has(m.id));
+      const emp_sf = (window._emp_sf || '').toLowerCase();
+      const emp_jf = window._emp_jf || '';
+      const empJobs = [...new Set(MEMBERS.map(m => m.job))].sort();
+      const empFiltered = MEMBERS.filter(m => (!emp_jf || m.job === emp_jf) && (!emp_sf || m.name.toLowerCase().includes(emp_sf) || m.job.toLowerCase().includes(emp_sf)));
+
+      return `
+<div class="p-4 md:p-6 w-full space-y-4 md:space-y-5">
+  <h1 class="text-2xl font-bold text-slate-800">🏰 Emperium Overrun</h1>
+  <div class="card p-5">
+    <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+      <h2 class="font-bold text-slate-700">📋 เช็คชื่อ</h2>
+      <span class="text-sm text-slate-400">เข้าร่วม <strong class="text-green-600">${attending.length}</strong>/${MEMBERS.length} คน</span>
+    </div>
+    <div class="mb-2 flex flex-wrap gap-2 items-center">
+      <input type="text" placeholder="🔍 ค้นหาชื่อหรืออาชีพ..." value="${window._emp_sf || ''}"
+        data-role="emp-search"
+        class="border border-slate-200 rounded-lg px-3 py-2 text-sm flex-1 min-w-44 outline-none focus:ring-2 focus:ring-blue-300"
+        oninput="window._emp_sf=this.value;rerender()">
+      <div class="flex flex-wrap gap-1">
+        <button class="tab-btn text-xs ${!emp_jf ? 'active' : ''}" onclick="window._emp_jf='';rerender()">ทั้งหมด</button>
+        ${empJobs.map(j => { return `<button class="tab-btn text-xs ${emp_jf === j ? 'active' : ''}" onclick="window._emp_jf='${j}';rerender()">${jobIcon(j, '16px')} ${j}</button>`; }).join('')}
+      </div>
+    </div>
+    <div class="checkin-grid grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2.5 max-h-80 overflow-y-auto pr-1" style="-webkit-overflow-scrolling:touch">
+      ${empFiltered.map(m => {
+        const ji = getJobInfo(m.job);
+        const partyIdx = parties.findIndex(p => p.members.includes(m.id));
+        const placed = partyIdx >= 0;
+        const status = getSignup(empEv, m.id);
+        const ring = placed ? 'ring-2 ring-amber-400 bg-amber-50' : status === 'no' ? 'opacity-40 bg-slate-50 border border-slate-200' : 'bg-white border border-slate-200 hover:border-amber-300';
+        const badge = placed ? `<span class="text-xs bg-amber-500 text-white px-1.5 py-0.5 rounded-md font-bold leading-none">${parties[partyIdx].name.replace('ปาร์ตี้ ', 'P')}</span>` : '';
+
+        return `<div class="checkin-card flex items-center gap-2.5 p-3 rounded-xl ${ring} cursor-pointer transition-all select-none"
+          onclick="clickCheckinEmp(event,${m.id})"
+          draggable="true" ondragstart="startDragFromCheckin(event,${m.id},'emp')" ondragend="endDrag(event)" ontouchstart="touchStartDrag(event,${m.id},'emp',true)"
+          title="${placed ? 'คลิกเพื่อนำออกจากปาร์ตี้' : 'ลากใส่ปาร์ตี้ หรือคลิกเพื่อเช็คชื่อ'}">
+          <span class="flex-shrink-0">${jobIcon(m.job, '24px')}</span>
+          <div class="flex-1 min-w-0">
+            <div class="text-xs font-semibold truncate">${m.name}</div>
+            <div class="job-label text-xs opacity-60 truncate" style="color:${ji.color}">${m.job}</div>
+          </div>
+          <span class="flex-shrink-0 text-sm">${badge}</span>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>
+
+  <div class="card p-5">
+    <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+      <h2 class="font-bold text-slate-700">👥 จัดปาร์ตี้</h2>
+      <div class="flex gap-2">
+        <button onclick="addEmpParty()" class="px-3 py-1.5 bg-amber-500 text-white rounded-lg text-xs font-semibold hover:bg-amber-600 transition-colors">+ สร้างปาร์ตี้</button>
+        ${parties.length ? `<button onclick="copyEmp()" class="px-3 py-1.5 bg-green-500 text-white rounded-lg text-xs font-semibold hover:bg-green-600 transition-colors">📋 Copy</button>` : ''}
+      </div>
+    </div>
+    ${(unassigned.length) ? `
+    <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-xl">
+      <div class="text-xs font-semibold text-blue-700 mb-2">ยังไม่ได้จัดปาร์ตี้ (${unassigned.length} คน) · <span class="font-normal">ลากใส่ปาร์ตี้ได้เลย</span></div>
+      <div class="flex flex-wrap gap-1.5">${unassigned.map(m => memberChip(m, '', ` draggable="true" ondragstart="startDragEmp(event,${m.id})" ondragend="endDrag(event)"`)).join('')}</div>
+    </div>`: ''}
+    ${parties.length === 0
+          ? `<div class="text-center text-slate-300 text-sm py-12 border-2 border-dashed border-slate-200 rounded-xl">กด "+ สร้างปาร์ตี้" เพื่อเริ่ม</div>`
+          : `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        ${parties.map((party, pi) => `
+        <div class="party-box emp-party" data-drop="emp" data-pi="${pi}"
+          ondragover="event.preventDefault()" ondragenter="event.preventDefault();this.classList.add('drag-over')" ondragleave="if(!this.contains(event.relatedTarget))this.classList.remove('drag-over')" ondrop="dropToEmpParty(event,${pi},this)">
+          <div class="flex items-center justify-between mb-2">
+            <input type="text" value="${party.name}" placeholder="ชื่อปาร์ตี้..." class="font-bold text-sm text-amber-800 bg-transparent outline-none border-b border-transparent hover:border-amber-300 focus:border-amber-500 transition-colors flex-1" onchange="renameEmp(${pi},this.value)">
+            <div class="flex items-center gap-1.5 ml-2">
+              <span class="text-xs px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700">${party.members.length}/5</span>
+              <button onclick="delEmpParty(${pi})" class="text-slate-300 hover:text-red-400 transition-colors text-xs">🗑️</button>
+            </div>
+          </div>
+          ${(party.members.length === 0) ? '<div class="text-slate-300 text-xs text-center py-2 pointer-events-none">↓ ลากสมาชิกมาวาง</div>' : ''}
+          <div class="space-y-1 mb-2">
+            ${party.members.map(mid => {
+            const m = getMember(mid); if (!m) return '';
+            const ji = getJobInfo(m.job);
+            return `<div class="party-member flex items-center gap-2 text-xs p-2.5 rounded-xl transition-opacity" style="background:${ji.bg};cursor:grab"
+                draggable="true" ondragstart="if(event.target.closest('button')){event.preventDefault();return;}startDragEmp(event,${mid})" ondragend="endDrag(event)" ontouchstart="if(!event.target.closest('button'))touchStartDrag(event,${mid},'emp',false)">
+                <span class="text-slate-300 leading-none select-none">⠿</span>
+                ${jobIcon(m.job, '18px')}
+                <span class="pmt flex-1 font-medium truncate" style="color:${ji.color}">${m.name}</span>
+                <span class="text-slate-400">${m.job.split(' ')[0]}</span>
+                <button onclick="event.stopPropagation();removeEmpMember(${pi},${mid})" class="text-slate-300 hover:text-red-400 transition-colors p-1.5 -mr-1" style="min-width:32px;min-height:32px;display:flex;align-items:center;justify-content:center">✕</button>
+              </div>`;
+          }).join('')}
+          </div>
+          ${(party.members.length < 5 && unassigned.length) ?
+              `<button onclick="openEmpAddModal(${pi})" class="w-full text-xs text-slate-400 hover:text-amber-600 py-1.5 border border-dashed border-amber-200 hover:border-amber-400 rounded-lg transition-colors">+ เพิ่มสมาชิก</button>` : ''}
+        </div>`).join('')}
+      </div>`}
+  </div>
+</div>`;
+    }
+
+    // ============================================================
+    // RENDER: MEMBERS & ATTENDANCE & SETTINGS
+    // ============================================================
+    function renderMembers() {
+      const MEMBERS = getMembers();
+      const isAdmin = state.userRole === 'admin';
+      const jf = window._jf || '', sf = (window._sf || '').toLowerCase();
+      const filtered = MEMBERS.filter(m => (!jf || m.job === jf) && (!sf || m.name.toLowerCase().includes(sf) || m.job.toLowerCase().includes(sf)));
+      const jobs = [...new Set(MEMBERS.map(m => m.job))].sort();
+
+      return `
+<div class="p-4 md:p-6 space-y-4 md:space-y-5">
+  <div class="flex items-center justify-between flex-wrap gap-3">
+    <h1 class="text-2xl font-bold text-slate-800">👥 สมาชิกกิล <span class="text-lg text-slate-400 font-normal">(${MEMBERS.length} คน)</span></h1>
+    ${isAdmin ? `<button onclick="openAddMemberModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm">+ เพิ่มสมาชิกใหม่</button>` : ''}
+  </div>
+  <div class="card p-4 flex flex-wrap gap-2 items-center">
+    <input type="text" placeholder="🔍 ค้นหาชื่อหรืออาชีพ..." value="${window._sf || ''}"
+      data-role="member-search"
+      class="border border-slate-200 rounded-lg px-3 py-2 text-sm flex-1 min-w-44 outline-none focus:ring-2 focus:ring-blue-300"
+      oninput="window._sf=this.value;rerender()">
+    <div class="flex flex-wrap gap-1">
+      <button class="tab-btn text-xs ${!jf ? 'active' : ''}" onclick="window._jf='';rerender()">ทั้งหมด</button>
+      ${jobs.map(j => { return `<button class="tab-btn text-xs ${jf === j ? 'active' : ''}" onclick="window._jf='${j}';rerender()">${jobIcon(j, '16px')} ${j}</button>`; }).join('')}
+    </div>
+  </div>
+  <div class="card overflow-hidden overflow-x-auto">
+    <table class="w-full text-sm" style="min-width:600px">
+      <thead class="bg-slate-50 border-b border-slate-200">
+        <tr>
+          <th class="text-left py-3 px-4 text-slate-500 font-semibold text-xs">#</th>
+          <th class="text-left py-3 px-4 text-slate-500 font-semibold text-xs">ชื่อ</th>
+          <th class="text-left py-3 px-4 text-slate-500 font-semibold text-xs">อาชีพ</th>
+          <th class="text-left py-3 px-4 text-slate-500 font-semibold text-xs">บทบาท</th>
+          <th class="text-left py-3 px-4 text-slate-500 font-semibold text-xs">ตำแหน่ง</th>
+          <th class="text-left py-3 px-4 text-slate-500 font-semibold text-xs">เข้ากิลวันที่</th>
+          <th class="text-left py-3 px-4 text-slate-500 font-semibold text-xs">อยู่ในกิล</th>
+          ${isAdmin ? `<th class="text-center py-3 px-4 text-slate-500 font-semibold text-xs">จัดการ</th>` : ''}
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        ${filtered.map((m, i) => {
+        const ji = getJobInfo(m.job);
+        const rs = GUILD_ROLE_STYLE[m.guildRole] || GUILD_ROLE_STYLE["Member"];
+        const dur = durationInGuild(m.joinDate);
+        const isNew = isNewMember(m.joinDate);
+        return `<tr class="hover:bg-slate-50 transition-colors">
+            <td class="py-2.5 px-4 text-slate-400 text-xs">${i + 1}</td>
+            <td class="py-2.5 px-4">
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style="background:${ji.bg}">${jobIcon(m.job, '24px')}</div>
+                <span class="font-medium text-slate-800">${m.name}</span>
+                ${isNew ? '<span class="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full font-semibold">New</span>' : ''}
+              </div>
+            </td>
+            <td class="py-2.5 px-4"><span class="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full font-medium" style="background:${ji.bg};color:${ji.color}">${jobIcon(m.job, '16px')} ${m.job}</span></td>
+            <td class="py-2.5 px-4"><span class="inline-flex text-xs px-2 py-1 rounded-full font-semibold ${ROLE_COLOR[ji.role] || 'bg-slate-100 text-slate-600'}">${ROLE_LABEL[ji.role] || ji.role}</span></td>
+            <td class="py-2.5 px-4"><span class="inline-flex text-xs px-2 py-1 rounded-full ${rs}">${m.guildRole}</span></td>
+            <td class="py-2.5 px-4 text-xs text-slate-500">${m.joinDate || '—'}</td>
+            <td class="py-2.5 px-4">${dur ? `<span class="text-xs font-medium ${isNew ? 'text-green-600' : 'text-slate-600'}">${dur}</span>` : `<span class="text-xs text-slate-300">—</span>`}</td>
+            ${isAdmin ? `<td class="py-2.5 px-4 text-center">
+              <div class="flex items-center justify-center gap-1">
+                <button onclick="openChangeJobModal(${m.id},'${m.name}','${m.job}')" class="text-slate-300 hover:text-blue-500 transition-colors p-1" title="เปลี่ยนอาชีพ">🔄</button>
+                <button onclick="deleteMember(${m.id}, '${m.name}')" class="text-slate-300 hover:text-red-500 transition-colors p-1" title="ลบผู้เล่นนี้ออกจากกิลด์">🗑️</button>
+              </div>
+            </td>` : ''}
+          </tr>`;
+      }).join('')}
+      </tbody>
+    </table>
+  </div>
+</div>`;
+    }
+
+    function renderAttendance() {
+      const MEMBERS = getMembers();
+      const trackEvts = WEEKLY_EVENTS.filter(e => e.type === 'guild_league' || e.type === 'emperium');
+      return `
+<div class="p-4 md:p-6 space-y-4 md:space-y-5">
+  <h1 class="text-2xl font-bold text-slate-800">📊 สถิติการเข้าร่วม</h1>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    ${trackEvts.map(ev => {
+        const att = getAttending(ev.id), pct = Math.round(att.length / (MEMBERS.length || 1) * 100);
+        return `<div class="card p-4 cursor-pointer hover:shadow-md transition-shadow"
+           onclick="${ev.type === 'guild_league' ? `glEv='${ev.id}'; showView('guild-league')` : `empEv='${ev.id}'; showView('emperium')`}">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="text-2xl">${ev.icon}</span>
+          <div class="flex-1 min-w-0">
+            <div class="font-semibold text-sm text-slate-700 leading-tight">${ev.name}</div>
+            <div class="text-xs text-slate-400">วัน${DAYS_TH[ev.day]}</div>
+          </div>
+        </div>
+        <div class="h-2 bg-slate-100 rounded-full mb-2 overflow-hidden">
+          <div class="h-full rounded-full" style="width:${pct}%;background:${ev.color}"></div>
+        </div>
+        <div class="flex justify-between text-xs font-semibold">
+          <span style="color:${ev.color}">${pct}%</span>
+          <span class="text-slate-400">${att.length}/${MEMBERS.length}</span>
+        </div>
+      </div>`;
+      }).join('')}
+  </div>
+  <div class="card p-5">
+    <h2 class="font-bold text-slate-700 mb-4">📋 ตารางรายบุคคล</h2>
+    <div class="overflow-x-auto">
+      <table class="w-full text-xs">
+        <thead class="bg-slate-50">
+          <tr>
+            <th class="text-left py-2 px-3 font-semibold text-slate-500 whitespace-nowrap">สมาชิก</th>
+            ${trackEvts.map(ev => `<th class="text-center py-2 px-2 font-semibold text-slate-500 whitespace-nowrap">${ev.icon}<br>${DAYS_SHORT[ev.day]}</th>`).join('')}
+            <th class="text-center py-2 px-3 font-semibold text-slate-500">รวม</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          ${MEMBERS.map(m => {
+        const ji = getJobInfo(m.job), att = trackEvts.filter(ev => getSignup(ev.id, m.id) === 'yes').length;
+        return `<tr class="hover:bg-slate-50">
+              <td class="py-2 px-3 whitespace-nowrap"><div class="flex items-center gap-1.5">${jobIcon(m.job, '16px')}<span class="font-medium">${m.name}</span></div></td>
+              ${trackEvts.map(ev => { const s = getSignup(ev.id, m.id); return `<td class="py-2 px-2 text-center">${s === 'yes' ? '✅' : s === 'no' ? '❌' : '⬜'}</td>`; }).join('')}
+              <td class="py-2 px-3 text-center font-bold ${att > 0 ? 'text-green-600' : 'text-slate-400'}">${att}/${trackEvts.length}</td>
+            </tr>`;
+      }).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>`;
+    }
+
+    function renderSettings() {
+      const hasSync = !!state.lastSync;
+      const lastSyncStr = hasSync ? new Date(state.lastSync).toLocaleString('th-TH') : 'ยังไม่เคย Sync';
+      return `
+<div class="p-4 md:p-6 w-full max-w-3xl space-y-5">
+  <h1 class="text-2xl font-bold text-slate-800">⚙️ ตั้งค่า (Settings)</h1>
+  <div class="card p-6 space-y-5">
+    <div class="flex items-center gap-3">
+      <div class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center text-2xl">☁️</div>
+      <div>
+        <h2 class="font-bold text-slate-800">ระบบเชื่อมต่อคลาวด์ (Google Apps Script)</h2>
+        <p class="text-sm text-slate-500">ข้อมูลทั้งหมดจะถูกบันทึกขึ้น Google Sheets อัตโนมัติ (Auto-save)</p>
+      </div>
+    </div>
+    
+    <div class="flex items-center justify-between flex-wrap gap-3 mt-4 pt-4 border-t border-slate-100">
+      <div class="text-sm text-slate-500">
+        <span>สถานะข้อมูล: </span>
+        <span class="${hasSync ? 'text-green-600 font-semibold' : 'text-slate-400'}">${lastSyncStr}</span>
+        ${hasSync ? `<span class="text-slate-400"> · ${getMembers().length} คน</span>` : ''}
+      </div>
+      <div class="flex gap-2">
+        ${hasSync ? `<button onclick="resetToDefault()" class="px-4 py-2 bg-slate-100 text-slate-600 rounded-xl text-sm font-semibold hover:bg-slate-200 transition-colors">↩️ ล้างข้อมูลกลับเป็นค่าเริ่มต้น</button>` : ''}
+        <button id="sync-btn" onclick="syncFromSheets()" class="px-5 py-2 bg-green-500 text-white rounded-xl text-sm font-semibold hover:bg-green-600 transition-colors shadow-sm">
+          🔄 โหลดข้อมูลจากคลาวด์
+        </button>
+      </div>
+    </div>
+  </div>
+</div>`;
+    }
+
+    // ============================================================
+    // ACTIONS
+    // ============================================================
+    function cycleSignup(eid, mid) {
+      const cur = getSignup(eid, mid);
+      setSignup(eid, mid, cur === 'maybe' ? 'yes' : cur === 'yes' ? 'no' : 'maybe');
+      rerender();
+    }
+
+    function autoAssignGL() {
+      const att = getAttending(glEv);
+      if (!att.length) { alert("ยังไม่มีสมาชิกที่เช็คชื่อ"); return; }
+      const data = getGLData(glEv);
+      data.elite = Array.from({ length: 8 }, () => []); data.secondary = [];
+      const elite = att.slice(0, 40), sec = att.slice(40);
+      const roleOrd = { healer: 0, tank: 1, dps: 2, support: 3 };
+      const sorted = [...elite].sort((a, b) => (roleOrd[getJobInfo(a.job).role] ?? 9) - (roleOrd[getJobInfo(b.job).role] ?? 9));
+      const healers = sorted.filter(m => getJobInfo(m.job).role === 'healer');
+      const others = sorted.filter(m => getJobInfo(m.job).role !== 'healer');
+      healers.forEach((m, i) => { if (i < 8) data.elite[i].push(m.id); else others.unshift(m); });
+      let pi = 0;
+      others.forEach(m => {
+        while (pi < 8 && data.elite[pi].length >= 5) pi++;
+        if (pi < 8) { data.elite[pi].push(m.id); pi++; if (pi >= 8) pi = 0; }
+        else data.secondary.push(m.id);
+      });
+      data.secondary.push(...sec.map(m => m.id));
+      saveState(); rerender();
+    }
+    function clearGL() { if (!confirm("ล้างการจัดปาร์ตี้?")) return; state.glParties[glEv] = { elite: Array.from({ length: 8 }, () => []), secondary: [] }; saveState(); rerender(); }
+    function copyGL() {
+      const data = getGLData(glEv), ev = WEEKLY_EVENTS.find(e => e.id === glEv);
+      let txt = `⚔️ Guild League (วัน${DAYS_TH[ev.day]})\n\n🏆 ELITE FIELD\n`;
+      data.elite.forEach((p, i) => { if (!p.length) return; txt += `\nปาร์ตี้ ${i + 1}:\n`; p.forEach(id => { const m = getMember(id); if (m) txt += `  • ${m.name} (${m.job})\n`; }); });
+      if (data.secondary.length) { txt += `\n🛡️ SECONDARY FIELD\n`; data.secondary.forEach(id => { const m = getMember(id); if (m) txt += `  • ${m.name} (${m.job})\n`; }); }
+      copyText(txt);
+    }
+    function removeElite(pi, mid) { const d = getGLData(glEv); d.elite[pi] = d.elite[pi].filter(i => i !== mid); setSignup(glEv, mid, 'maybe'); saveState(); rerender(); }
+    function removeSecondary(mid) { const d = getGLData(glEv); d.secondary = d.secondary.filter(i => i !== mid); setSignup(glEv, mid, 'maybe'); saveState(); rerender(); }
+    function moveAllSecondary() {
+      const att = getAttending(glEv), data = getGLData(glEv);
+      const assigned = new Set([...data.elite.flat(), ...data.secondary]);
+      att.filter(m => !assigned.has(m.id)).forEach(m => data.secondary.push(m.id));
+      saveState(); rerender();
+    }
+    function openMemberModal(eid, mid) {
+      const data = getGLData(eid), m = getMember(mid);
+      showModal(`<div class="p-6">
+    <h3 class="font-bold text-base text-slate-800 mb-4">เพิ่ม ${m.name} เข้าปาร์ตี้ไหน?</h3>
+    <div class="space-y-2">
+      ${data.elite.map((party, pi) => {
+        const full = party.length >= 5; return `<button onclick="assignToElite('${eid}',${pi},${mid})" ${full ? 'disabled' : ''}
+        class="w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm transition-all ${full ? 'opacity-40 bg-slate-50 cursor-not-allowed' : 'bg-blue-50 hover:bg-blue-100 cursor-pointer border border-blue-200'}">
+        <span class="font-medium">ปาร์ตี้ ${pi + 1}</span>
+        <span class="text-slate-500 text-xs">${party.length}/5${full ? ' (เต็ม)' : ''}</span>
+      </button>`;
+      }).join('')}
+      <button onclick="assignToSecondary('${eid}',${mid})" class="w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm bg-orange-50 hover:bg-orange-100 cursor-pointer border border-orange-200 transition-all">
+        <span class="font-medium">🛡️ Secondary</span><span class="text-slate-500 text-xs">${data.secondary.length} คน</span>
+      </button>
+    </div>
+    <button onclick="closeModal()" class="mt-3 w-full py-2 text-xs text-slate-400 hover:text-slate-600">ยกเลิก</button>
+  </div>`);
+    }
+    function openPartyModal(pi) {
+      const data = getGLData(glEv), att = getAttending(glEv);
+      const assigned = new Set([...data.elite.flat(), ...data.secondary]);
+      const avail = att.filter(m => !assigned.has(m.id) && !data.elite[pi].includes(m.id));
+      showModal(`<div class="p-6">
+    <h3 class="font-bold text-base text-slate-800 mb-4">เพิ่มสมาชิกเข้า ปาร์ตี้ ${pi + 1}</h3>
+    ${avail.length === 0 ? '<p class="text-slate-400 text-center py-6">ไม่มีสมาชิกว่าง</p>' : `
+    <div class="space-y-1.5 max-h-72 overflow-y-auto">
+      ${avail.map(m => {
+        const ji = getJobInfo(m.job); return `
+      <button onclick="assignToElite('${glEv}',${pi},${m.id})" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:opacity-85 transition-all cursor-pointer" style="background:${ji.bg}">
+        ${jobIcon(m.job, '24px')}
+        <span class="flex-1 text-left font-medium text-sm" style="color:${ji.color}">${m.name}</span>
+        <span class="text-xs text-slate-500">${m.job}</span>
+      </button>`;
+      }).join('')}
+    </div>`}
+    <button onclick="closeModal()" class="mt-3 w-full py-2 text-xs text-slate-400 hover:text-slate-600">ยกเลิก</button>
+  </div>`);
+    }
+    function assignToElite(eid, pi, mid) {
+      const d = getGLData(eid); if (d.elite[pi].length >= 5) return;
+      d.secondary = d.secondary.filter(i => i !== mid);
+      d.elite.forEach(p => { const x = p.indexOf(mid); if (x > -1) p.splice(x, 1); });
+      d.elite[pi].push(mid); saveState(); closeModal(); rerender();
+    }
+    function assignToSecondary(eid, mid) {
+      const d = getGLData(eid);
+      d.elite.forEach(p => { const x = p.indexOf(mid); if (x > -1) p.splice(x, 1); });
+      if (!d.secondary.includes(mid)) d.secondary.push(mid);
+      saveState(); closeModal(); rerender();
+    }
+
+    function addEmpParty() { const p = getEmpData(empEv); p.push({ name: `ปาร์ตี้ ${p.length + 1}`, members: [] }); saveState(); rerender(); }
+    function renameEmp(pi, name) { getEmpData(empEv)[pi].name = name; saveState(); }
+    function delEmpParty(pi) { if (!confirm("ลบปาร์ตี้นี้?")) return; getEmpData(empEv).splice(pi, 1); saveState(); rerender(); }
+    function removeEmpMember(pi, mid) { getEmpData(empEv)[pi].members = getEmpData(empEv)[pi].members.filter(i => i !== mid); setSignup(empEv, mid, 'maybe'); saveState(); rerender(); }
+    function openEmpAddModal(pi) {
+      const att = getAttending(empEv), parties = getEmpData(empEv);
+      const assigned = new Set(parties.flatMap(p => p.members));
+      const avail = att.filter(m => !assigned.has(m.id));
+      showModal(`<div class="p-6">
+    <h3 class="font-bold text-base text-slate-800 mb-4">เพิ่มสมาชิกเข้า ${parties[pi].name}</h3>
+    ${avail.length === 0 ? '<p class="text-slate-400 text-center py-6">ไม่มีสมาชิกว่าง</p>' : `
+    <div class="space-y-1.5 max-h-72 overflow-y-auto">
+      ${avail.map(m => {
+        const ji = getJobInfo(m.job); return `
+      <button onclick="addEmpMember(${pi},${m.id})" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:opacity-85 transition-all cursor-pointer" style="background:${ji.bg}">
+        ${jobIcon(m.job, '24px')}
+        <span class="flex-1 text-left font-medium text-sm" style="color:${ji.color}">${m.name}</span>
+        <span class="text-xs text-slate-500">${m.job}</span>
+      </button>`;
+      }).join('')}
+    </div>`}
+    <button onclick="closeModal()" class="mt-3 w-full py-2 text-xs text-slate-400 hover:text-slate-600">ยกเลิก</button>
+  </div>`);
+    }
+    function addEmpMember(pi, mid) {
+      const parties = getEmpData(empEv); if (parties[pi].members.length >= 5) return;
+      parties.forEach(p => { p.members = p.members.filter(i => i !== mid); });
+      parties[pi].members.push(mid); saveState(); closeModal(); rerender();
+    }
+    function copyEmp() {
+      const parties = getEmpData(empEv), ev = WEEKLY_EVENTS.find(e => e.id === empEv);
+      let txt = `🏰 Emperium Overrun (วัน${DAYS_TH[ev.day]})\n\n`;
+      parties.forEach(p => { txt += `${p.name}:\n`; p.members.forEach(id => { const m = getMember(id); if (m) txt += `  • ${m.name} (${m.job})\n`; }); txt += '\n'; });
+      copyText(txt);
+    }
+
+    function resetToDefault() {
+      if (!confirm("รีเซ็ตกลับไปใช้ข้อมูลเริ่มต้นหรือไม่?\n*หากต้องการข้อมูลจาก Sheet คืน ให้กด โหลดข้อมูลจากคลาวด์ อีกครั้ง*")) return;
+      state.members = null; state.lastSync = null;
+      saveState(); updateSyncStatus();
+      document.getElementById('total-members').textContent = getMembers().length;
+      showToast("↩️ ล้างข้อมูลเรียบร้อยแล้ว"); rerender();
+    }
+
+    // ------------------------------------------------------------
+    // ADD / DELETE MEMBER
+    // ------------------------------------------------------------
+    function openAddMemberModal() {
+      const jobs = Object.keys(JOB_INFO).sort();
+      const roles = ["Guild Master", "Vice Guild Master", "Commander", "Officer", "Charisma Baby", "Member"];
+      const today = new Date().toISOString().split('T')[0];
+
+      showModal(`
+    <div class="p-6">
+      <h3 class="font-bold text-xl text-slate-800 mb-4 flex items-center gap-2"><span>👤</span> เพิ่มสมาชิกใหม่</h3>
+      <form onsubmit="submitAddMember(event)" class="space-y-4">
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1">ชื่อตัวละคร (Name)</label>
+          <input type="text" id="add-member-name" required class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="เช่น Kaixy">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1">อาชีพ (Job)</label>
+          <select id="add-member-job" required class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+            ${jobs.map(j => `<option value="${j}">${getJobInfo(j).emoji} ${j}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1">ตำแหน่ง (Guild Role)</label>
+          <select id="add-member-role" required class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+            ${roles.map(r => `<option value="${r}" ${r === 'Member' ? 'selected' : ''}>${r}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1">วันที่เข้ากิล (Join Date)</label>
+          <input type="date" id="add-member-date" required value="${today}" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        <div class="pt-2 flex gap-2">
+          <button type="button" onclick="closeModal()" class="flex-1 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold transition-colors">ยกเลิก</button>
+          <button type="submit" class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm">บันทึก</button>
+        </div>
+      </form>
+    </div>
+  `);
+    }
+
+    function submitAddMember(e) {
+      e.preventDefault();
+      const name = document.getElementById('add-member-name').value.trim();
+      const job = document.getElementById('add-member-job').value;
+      const role = document.getElementById('add-member-role').value;
+      const joinDate = document.getElementById('add-member-date').value;
+
+      if (!name) return;
+      if (!state.members) state.members = [];
+
+      state.members.push({ name: name, job: job, guildRole: role, joinDate: joinDate });
+      saveState();
+      document.getElementById('total-members').textContent = getMembers().length;
+      closeModal();
+      showToast(`✅ เพิ่มสมาชิก ${name} สำเร็จ`);
+      rerender();
+    }
+
+    function deleteMember(id, name) {
+      if (state.userRole !== 'admin') return;
+
+      if (!confirm(`⚠️ คุณแน่ใจหรือไม่ว่าต้องการลบ [ ${name} ] ออกจากกิลด์?\n\n* ข้อมูลการเช็คชื่อและการจัดปาร์ตี้ของคนนี้จะถูกลบออกไปด้วย`)) {
+        return;
+      }
+
+      // 1. ลบออกจากรายชื่อหลัก (ใช้ name ในการลบ)
+      if (!state.members) state.members = JSON.parse(JSON.stringify(MEMBERS_DEFAULT));
+      state.members = state.members.filter(m => m.name !== name);
+
+      // 2. จัดการข้อมูลเช็คชื่อ (ลบคนนี้ออก และขยับ ID คนถัดไป)
+      for (let ev in state.signups) {
+        if (!state.signups[ev]) continue;
+        const newSignups = {};
+        for (let oldIdStr in state.signups[ev]) {
+          let oldId = parseInt(oldIdStr);
+          if (oldId === id) continue; // ข้ามคนที่ถูกกดลบ
+          let newId = oldId > id ? oldId - 1 : oldId;
+          newSignups[newId] = state.signups[ev][oldIdStr];
+        }
+        state.signups[ev] = newSignups;
+      }
+
+      // 3. จัดการขยับ ID ในปาร์ตี้ Guild League
+      for (let ev in state.glParties) {
+        if (state.glParties[ev].elite) {
+          state.glParties[ev].elite = state.glParties[ev].elite.map(p =>
+            p.filter(i => i !== id).map(i => i > id ? i - 1 : i)
+          );
+        }
+        if (state.glParties[ev].secondary) {
+          state.glParties[ev].secondary = state.glParties[ev].secondary
+            .filter(i => i !== id)
+            .map(i => i > id ? i - 1 : i);
+        }
+      }
+
+      // 4. จัดการขยับ ID ในปาร์ตี้ Emperium
+      for (let ev in state.empParties) {
+        if (Array.isArray(state.empParties[ev])) {
+          state.empParties[ev].forEach(p => {
+            if (p.members) {
+              p.members = p.members
+                .filter(i => i !== id)
+                .map(i => i > id ? i - 1 : i);
+            }
+          });
+        }
+      }
+
+      saveState();
+      document.getElementById('total-members').textContent = getMembers().length;
+      showToast(`🗑️ ลบ ${name} ออกจากกิลด์แล้ว`);
+      rerender();
+    }
+
+    function openChangeJobModal(id, name, currentJob) {
+      if (state.userRole !== 'admin') return;
+      const jobs = Object.keys(JOB_INFO).sort();
+      showModal(`
+    <div class="p-6">
+      <h3 class="font-bold text-xl text-slate-800 mb-1 flex items-center gap-2">🔄 เปลี่ยนอาชีพ</h3>
+      <p class="text-sm text-slate-500 mb-4"><strong>${name}</strong> · อาชีพปัจจุบัน: ${jobIcon(currentJob, '18px')} ${currentJob}</p>
+      <div class="mb-4">
+        <label class="block text-sm font-semibold text-slate-700 mb-1">อาชีพใหม่</label>
+        <select id="change-job-select" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+          ${jobs.map(j => `<option value="${j}" ${j === currentJob ? 'selected' : ''}>${getJobInfo(j).emoji} ${j}</option>`).join('')}
+        </select>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="closeModal()" class="flex-1 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold transition-colors">ยกเลิก</button>
+        <button onclick="changeJob(${id})" class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm">บันทึก</button>
+      </div>
+    </div>
+  `);
+    }
+
+    function changeJob(id) {
+      if (state.userRole !== 'admin') return;
+      const newJob = document.getElementById('change-job-select').value;
+      const idx = id - 1;
+      if (!state.members || !state.members[idx]) return;
+      const oldJob = state.members[idx].job;
+      if (newJob === oldJob) { closeModal(); return; }
+      state.members[idx].job = newJob;
+      saveState();
+      closeModal();
+      showToast(`✅ เปลี่ยนอาชีพ ${state.members[idx].name} เป็น ${getJobInfo(newJob).emoji} ${newJob}`);
+      rerender();
+    }
+
+    // ============================================================
+    // CHECK-IN SMART CLICK 
+    // ============================================================
+    function clickCheckinGL(e, mid) {
+      if (_drag) return;
+      const d = getGLData(glEv);
+      const pi = d.elite.findIndex(p => p.includes(mid));
+      if (pi >= 0) {
+        d.elite[pi] = d.elite[pi].filter(i => i !== mid);
+        setSignup(glEv, mid, 'maybe');
+        saveState(); rerender();
+        showToast(`↩️ นำออกจากปาร์ตี้ ${pi + 1}`);
+      } else if (d.secondary.includes(mid)) {
+        d.secondary = d.secondary.filter(i => i !== mid);
+        setSignup(glEv, mid, 'maybe');
+        saveState(); rerender();
+        showToast('↩️ นำออกจาก Secondary');
+      } else {
+        cycleSignup(glEv, mid);
+      }
+    }
+    function clickCheckinEmp(e, mid) {
+      if (_drag) return;
+      const parties = getEmpData(empEv);
+      const pi = parties.findIndex(p => p.members.includes(mid));
+      if (pi >= 0) {
+        parties[pi].members = parties[pi].members.filter(i => i !== mid);
+        setSignup(empEv, mid, 'maybe');
+        saveState(); rerender();
+        showToast('↩️ นำออกจากปาร์ตี้');
+      } else {
+        cycleSignup(empEv, mid);
+      }
+    }
+
+    // ============================================================
+    // DRAG AND DROP / TOUCH EVENT (Stable, jitter-free)
+    // - Dead zone 14px ป้องกัน drag โดยไม่ตั้งใจ
+    // - body lock ป้องกัน scroll กระตุกระหว่าง drag
+    // - requestAnimationFrame + transform3d สำหรับ ghost ที่ลื่นไหล
+    // ============================================================
+    let _drag = null;
+    let _touch = null;
+    let _rafId = null;
+
+    function touchStartDrag(e, mid, mode, fromCheckin) {
+      if (e.target.closest('button')) return;
+      const t = e.touches[0];
+      _touch = {
+        mid, mode, fromCheckin,
+        startX: t.clientX, startY: t.clientY,
+        moved: false, el: e.currentTarget,
+        ghost: null, offsetX: 0, offsetY: 0,
+        lastX: t.clientX, lastY: t.clientY
+      };
+    }
+
+    document.addEventListener('touchmove', function (e) {
+      if (!_touch) return;
+      const t = e.touches[0];
+      const dx = t.clientX - _touch.startX;
+      const dy = t.clientY - _touch.startY;
+
+      // Dead zone 14px เพื่อแยก tap จาก drag ชัดเจน
+      if (!_touch.moved && Math.sqrt(dx * dx + dy * dy) > 14) {
+        _touch.moved = true;
+        _drag = { mid: _touch.mid, mode: _touch.mode, fromCheckin: _touch.fromCheckin };
+        _touch.el.classList.add('dragging');
+
+        // Lock body scroll ทันที
+        document.body.classList.add('touch-dragging');
+
+        const rect = _touch.el.getBoundingClientRect();
+        const g = _touch.el.cloneNode(true);
+        g.id = 'touch-ghost';
+        g.style.width = rect.width + 'px';
+        g.style.left = '0';
+        g.style.top = '0';
+        g.style.transform = `translate3d(${rect.left}px,${rect.top}px,0) scale(1.04) rotate(1deg)`;
+        document.body.appendChild(g);
+        _touch.ghost = g;
+        _touch.offsetX = t.clientX - rect.left;
+        _touch.offsetY = t.clientY - rect.top;
+      }
+
+      if (_touch.moved) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        _touch.lastX = t.clientX;
+        _touch.lastY = t.clientY;
+
+        // rAF sync กับ frame rate ป้องกันกระตุก
+        if (_rafId) cancelAnimationFrame(_rafId);
+        _rafId = requestAnimationFrame(() => {
+          if (!_touch || !_touch.ghost) return;
+          const gx = _touch.lastX - _touch.offsetX;
+          const gy = _touch.lastY - _touch.offsetY;
+          _touch.ghost.style.transform = `translate3d(${gx}px,${gy}px,0) scale(1.04) rotate(1deg)`;
+
+          _touch.ghost.style.visibility = 'hidden';
+          const under = document.elementFromPoint(_touch.lastX, _touch.lastY);
+          _touch.ghost.style.visibility = '';
+          document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+          const dz = under?.closest('[data-drop]');
+          if (dz) dz.classList.add('drag-over');
+        });
+      }
+    }, { passive: false });
+
+    function _cleanupTouch() {
+      if (_rafId) { cancelAnimationFrame(_rafId); _rafId = null; }
+      if (_touch && _touch.ghost) { _touch.ghost.remove(); _touch.ghost = null; }
+      document.body.classList.remove('touch-dragging');
+      document.querySelectorAll('.dragging').forEach(el => el.classList.remove('dragging'));
+      document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+    }
+
+    document.addEventListener('touchend', function (e) {
+      if (!_touch) return;
+      _cleanupTouch();
+
+      if (!_touch.moved) {
+        _touch = null;
+        return;
+      }
+
+      const t = e.changedTouches[0];
+      const { mid, mode, fromCheckin } = _touch;
+      _touch = null;
+
+      const under = document.elementFromPoint(t.clientX, t.clientY);
+      const dz = under?.closest('[data-drop]');
+
+      if (dz) {
+        const dropType = dz.dataset.drop;
+        const pi = parseInt(dz.dataset.pi);
+        if (mode === 'gl') {
+          if (dropType === 'elite') {
+            if (fromCheckin) setSignup(glEv, mid, 'yes');
+            assignToElite(glEv, pi, mid);
+          } else if (dropType === 'secondary') {
+            if (fromCheckin) setSignup(glEv, mid, 'yes');
+            assignToSecondary(glEv, mid);
+          }
+        } else if (mode === 'emp') {
+          if (dropType === 'emp') {
+            if (fromCheckin) setSignup(empEv, mid, 'yes');
+            addEmpMember(pi, mid);
+          }
+        }
+      } else {
+        if (!fromCheckin) {
+          if (mode === 'gl') {
+            const d = getGLData(glEv);
+            const inElite = d.elite.some(p => p.includes(mid)), inSec = d.secondary.includes(mid);
+            if (inElite || inSec) {
+              d.elite.forEach(p => { const i = p.indexOf(mid); if (i > -1) p.splice(i, 1); });
+              d.secondary = d.secondary.filter(i => i !== mid);
+              setSignup(glEv, mid, 'maybe'); saveState(); rerender();
+              showToast('↩️ นำออกจากปาร์ตี้แล้ว');
+            }
+          } else if (mode === 'emp') {
+            const parties = getEmpData(empEv);
+            const pi = parties.findIndex(p => p.members.includes(mid));
+            if (pi >= 0) {
+              parties[pi].members = parties[pi].members.filter(i => i !== mid);
+              setSignup(empEv, mid, 'maybe'); saveState(); rerender();
+              showToast('↩️ นำออกจากปาร์ตี้แล้ว');
+            }
+          }
+        }
+        _drag = null;
+      }
+    });
+
+    document.addEventListener('touchcancel', function () {
+      if (!_touch) return;
+      _cleanupTouch();
+      _touch = null;
+      _drag = null;
+    });
+
+    function startDragGL(e, mid) {
+      _drag = { mid, mode: 'gl', fromCheckin: false };
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', String(mid));
+      const el = e.currentTarget;
+      requestAnimationFrame(() => el.classList.add('dragging'));
+    }
+    function startDragEmp(e, mid) {
+      _drag = { mid, mode: 'emp', fromCheckin: false };
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', String(mid));
+      const el = e.currentTarget;
+      requestAnimationFrame(() => el.classList.add('dragging'));
+    }
+    function startDragFromCheckin(e, mid, mode) {
+      _drag = { mid, mode, fromCheckin: true };
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', String(mid));
+      const el = e.currentTarget;
+      requestAnimationFrame(() => el.classList.add('dragging'));
+    }
+    function endDrag(e) {
+      document.querySelectorAll('.dragging').forEach(el => el.classList.remove('dragging'));
+      document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+
+      if (_drag && !_drag.fromCheckin) {
+        const { mid, mode } = _drag;
+        _drag = null;
+        if (mode === 'gl') {
+          const d = getGLData(glEv);
+          const inElite = d.elite.some(p => p.includes(mid));
+          const inSec = d.secondary.includes(mid);
+          if (inElite || inSec) {
+            d.elite.forEach(p => { const i = p.indexOf(mid); if (i > -1) p.splice(i, 1); });
+            d.secondary = d.secondary.filter(i => i !== mid);
+            setSignup(glEv, mid, 'maybe'); saveState(); rerender();
+            showToast('↩️ นำออกจากปาร์ตี้แล้ว');
+          }
+        } else if (mode === 'emp') {
+          const parties = getEmpData(empEv);
+          const pi = parties.findIndex(p => p.members.includes(mid));
+          if (pi >= 0) {
+            parties[pi].members = parties[pi].members.filter(i => i !== mid);
+            setSignup(empEv, mid, 'maybe'); saveState(); rerender();
+            showToast('↩️ นำออกจากปาร์ตี้แล้ว');
+          }
+        }
+      } else {
+        _drag = null;
+      }
+    }
+    function _getDragMid(e) {
+      const mid = _drag ? _drag.mid : parseInt(e.dataTransfer.getData('text/plain'));
+      return isNaN(mid) ? null : mid;
+    }
+    function dropToElite(e, pi, el) {
+      e.preventDefault();
+      if (el) el.classList.remove('drag-over');
+      const mid = _getDragMid(e); if (!mid) return;
+      const fromCheckin = _drag && _drag.fromCheckin;
+      _drag = null;
+      if (fromCheckin) setSignup(glEv, mid, 'yes');
+      assignToElite(glEv, pi, mid);
+    }
+    function dropToSecondaryZone(e, el) {
+      e.preventDefault();
+      if (el) el.classList.remove('drag-over');
+      const mid = _getDragMid(e); if (!mid) return;
+      const fromCheckin = _drag && _drag.fromCheckin;
+      _drag = null;
+      if (fromCheckin) setSignup(glEv, mid, 'yes');
+      assignToSecondary(glEv, mid);
+    }
+    function dropToEmpParty(e, pi, el) {
+      e.preventDefault();
+      if (el) el.classList.remove('drag-over');
+      const mid = _getDragMid(e); if (!mid) return;
+      const fromCheckin = _drag && _drag.fromCheckin;
+      _drag = null;
+      if (fromCheckin) setSignup(empEv, mid, 'yes');
+      addEmpMember(pi, mid);
+    }
+
+    // ============================================================
+    // UI HELPERS
+    // ============================================================
+    function showModal(html) { document.getElementById('modal-content').innerHTML = html; document.getElementById('modal-overlay').style.display = 'flex'; }
+    function closeModal(e) { if (e && e.target !== document.getElementById('modal-overlay')) return; document.getElementById('modal-overlay').style.display = 'none'; }
+    let _toastT;
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.style.display = 'block'; t.style.opacity = '1';
+      clearTimeout(_toastT); _toastT = setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.style.display = 'none', 400); }, 2500);
+    }
+    function copyText(txt) {
+      navigator.clipboard.writeText(txt).then(() => showToast("✅ คัดลอกแล้ว!")).catch(() => {
+        const ta = document.createElement('textarea'); ta.value = txt;
+        document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+        document.body.removeChild(ta); showToast("✅ คัดลอกแล้ว!");
+      });
+    }
+    function showView(v) {
+      if (state.userRole === 'member' && v === 'settings') return;
+      state.currentView = v;
+      sessionStorage.setItem('currentView', v);
+      document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+      const n = document.getElementById(`nav-${v}`); if (n) n.classList.add('active');
+      closeSidebar();
+      rerender();
+    }
+    function toggleSidebar() {
+      const s = document.getElementById('sidebar');
+      const b = document.getElementById('sidebar-backdrop');
+      const open = s.classList.toggle('sidebar-open');
+      b.style.display = open ? 'block' : 'none';
+    }
+    function closeSidebar() {
+      document.getElementById('sidebar')?.classList.remove('sidebar-open');
+      const b = document.getElementById('sidebar-backdrop');
+      if (b) b.style.display = 'none';
+    }
+    function rerender() {
+      const m = document.getElementById('main-content');
+      const views = { dashboard: renderDashboard, calendar: renderCalendar, 'guild-league': renderGuildLeague, emperium: renderEmperium, members: renderMembers, attendance: renderAttendance, settings: renderSettings };
+      const focused = document.activeElement;
+      const SEARCH_ROLES = ['member-search', 'gl-search', 'emp-search'];
+      const focusedRole = focused && focused.getAttribute && focused.getAttribute('data-role');
+      const isSearchInput = SEARCH_ROLES.includes(focusedRole);
+      const selStart = isSearchInput ? focused.selectionStart : null;
+      m.innerHTML = (views[state.currentView] || renderDashboard)();
+      if (isSearchInput) {
+        const el = m.querySelector(`[data-role="${focusedRole}"]`);
+        if (el) { el.focus(); try { el.setSelectionRange(selStart, selStart); } catch (e) { } }
+      }
+      const mc = document.getElementById('mobile-member-count');
+      if (mc) mc.textContent = `👥 ${getMembers().length}`;
+    }
+
+    // ============================================================
+    // INIT
+    // ============================================================
+    loadState();
+    document.getElementById('total-members').textContent = getMembers().length;
+    updateSyncStatus();
+
+    // Auto-login: ถ้ามี session อยู่ (ไม่ต้อง login ใหม่เวลา refresh)
+    (function autoLogin() {
+      const session = sessionStorage.getItem('ro_gm_session');
+      const cv = sessionStorage.getItem('currentView');
+      if (session && (session === 'admin' || session === 'member')) {
+        state.userRole = session;
+        if (cv) state.currentView = cv;
+        startApp(true);
+      }
+    })();
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,299 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+/* ============================================================
+   BASE & RESET
+   ============================================================ */
+*{font-family:'Noto Sans Thai','Inter',sans-serif;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{overscroll-behavior:none;-webkit-overflow-scrolling:touch}
+body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:#f1f5f9}
+::-webkit-scrollbar-thumb{background:#94a3b8;border-radius:3px}
+
+/* ============================================================
+   NAVIGATION (Sidebar)
+   - iOS HIG: min 44pt tap
+   - Material: min 48dp tap
+   ============================================================ */
+.nav-link{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 14px;  /* ↑ จาก 9px → 12px ให้สูง ≥48dp */
+  border-radius:10px;color:#94a3b8;cursor:pointer;
+  transition:all .2s;font-weight:500;font-size:14px;
+  user-select:none;min-height:48px;
+  -webkit-user-select:none;
+}
+.nav-link:hover{background:rgba(255,255,255,.1);color:#e2e8f0}
+.nav-link.active{background:rgba(255,255,255,.15);color:#fff;border-left:3px solid #60a5fa}
+
+/* ============================================================
+   CARD
+   ============================================================ */
+.card{background:#fff;border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04)}
+
+/* ============================================================
+   PARTY BOX (Drag targets)
+   ============================================================ */
+.party-box{
+  border:2px dashed #e2e8f0;border-radius:12px;
+  padding:14px;min-height:160px;
+  transition:border-color .2s,background .2s;
+  touch-action:pan-y;  /* ยอมให้ scroll แนวตั้ง แต่ระบบ drag จัดการเอง */
+}
+.party-box.full{border-color:#22c55e!important;background:#f0fdf4}
+
+/* ============================================================
+   MEMBER CHIP (draggable pills)
+   - ขยาย touch target เป็น ≥44pt
+   ============================================================ */
+.member-chip{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 14px;  /* ↑ จาก 4px 10px → 8px 14px */
+  border-radius:22px;font-size:13px;cursor:pointer;
+  transition:all .15s;user-select:none;-webkit-user-select:none;
+  font-weight:500;min-height:44px;
+  touch-action:none;  /* ป้องกัน scroll กระตุกระหว่าง drag */
+}
+.member-chip:hover{opacity:.85}
+.member-chip:active{transform:scale(.97)}
+
+/* ============================================================
+   TAB BUTTON (Job filter tabs)
+   - ขนาด ≥44pt สำหรับนิ้วกด
+   ============================================================ */
+.tab-btn{
+  padding:8px 16px;  /* ↑ จาก 6px 14px */
+  border-radius:10px;font-weight:500;font-size:13px;
+  cursor:pointer;transition:all .2s;
+  min-height:40px;display:inline-flex;align-items:center;gap:4px;
+  user-select:none;-webkit-user-select:none;
+  white-space:nowrap;
+}
+.tab-btn.active{background:#3b82f6;color:#fff}
+.tab-btn:not(.active){color:#64748b}
+.tab-btn:not(.active):hover{background:#f1f5f9}
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+#toast{transition:opacity .4s;pointer-events:none}
+
+/* ============================================================
+   LOADING SPINNER
+   ============================================================ */
+.spin{animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ============================================================
+   DRAG & DROP VISUAL FEEDBACK
+   - เพิ่ม visual ชัดเจนขึ้นเวลา drag-over
+   ============================================================ */
+.drag-over{
+  border-color:#3b82f6!important;
+  background:#dbeafe!important;
+  box-shadow:inset 0 0 0 2px #93c5fd;
+  transform:scale(1.01);  /* ขยายเล็กน้อยเพื่อให้รู้ว่า drop ได้ */
+  transition:transform .15s,border-color .15s,background .15s;
+}
+.dragging{opacity:.25!important;pointer-events:none}
+.drag-hint{color:#94a3b8;font-size:11px;text-align:center;padding:6px 0;display:none}
+.party-box:empty .drag-hint,.party-box .drag-hint{display:block}
+
+/* ============================================================
+   PARTY MEMBER ROW (inside party box)
+   - touch target ≥44pt
+   ============================================================ */
+.party-member{
+  min-height:44px;display:flex;align-items:center;
+  touch-action:none;  /* ป้องกัน scroll interference ระหว่าง drag */
+}
+
+/* ============================================================
+   CHECK-IN CARD (member grid cards)
+   - touch target ≥48dp
+   - ป้องกัน reflow/jitter
+   ============================================================ */
+.checkin-card{
+  min-height:52px;
+  touch-action:none;
+  will-change:transform;  /* GPU layer แยก ป้องกันการ repaint กระตุก */
+  -webkit-user-select:none;
+  user-select:none;
+}
+
+/* ============================================================
+   MOBILE SIDEBAR
+   - เพิ่ม will-change เพื่อ GPU acceleration
+   - safe area padding
+   ============================================================ */
+#sidebar{
+  transition:transform .25s cubic-bezier(.4,0,.2,1);
+  will-change:transform;
+  overscroll-behavior:contain;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+#mobile-bar{display:none}
+
+@media(max-width:767px){
+  #sidebar{
+    position:fixed;top:0;left:0;height:100vh;height:100dvh;
+    z-index:40;transform:translateX(-100%);
+    width:280px;  /* กว้างขึ้นให้กดง่ายบนมือถือ */
+  }
+  #sidebar.sidebar-open{transform:translateX(0)}
+  #mobile-bar{display:flex}
+  #app-layout{padding-top:56px}
+
+  /* ปรับ check-in grid ให้ 2 column เต็มจอ เว้นที่กดง่าย */
+  .checkin-grid{
+    grid-template-columns:repeat(2,1fr)!important;
+    gap:8px!important;
+  }
+}
+
+/* Tablet (iPad) */
+@media(min-width:768px) and (max-width:1024px){
+  #sidebar{width:220px}
+  .checkin-grid{
+    grid-template-columns:repeat(3,1fr)!important;
+  }
+}
+
+/* ============================================================
+   BODY LOCK เวลา drag (ป้องกัน scroll กระตุก)
+   ============================================================ */
+body.touch-dragging{
+  overflow:hidden!important;
+  touch-action:none!important;
+  -webkit-overflow-scrolling:auto!important;
+}
+body.touch-dragging #main-content{
+  overflow:hidden!important;
+  pointer-events:none;
+}
+
+/* ============================================================
+   TOUCH DRAG GHOST
+   - GPU acceleration ด้วย transform3d
+   - ลด jitter ด้วย will-change
+   ============================================================ */
+#touch-ghost{
+  position:fixed;pointer-events:none;z-index:9999;
+  opacity:.85;
+  transform:translate3d(0,0,0) scale(1.04) rotate(1deg);
+  box-shadow:0 16px 40px rgba(0,0,0,.3),0 0 0 2px rgba(59,130,246,.4);
+  border-radius:12px;
+  transition:none;
+  will-change:left,top;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+}
+
+/* ============================================================
+   JOB ICONS
+   ============================================================ */
+.job-icon{
+  display:inline-block;vertical-align:middle;
+  border:1.5px solid rgba(0,0,0,.1);
+  flex-shrink:0;
+  box-shadow:0 1px 2px rgba(0,0,0,.08);
+}
+.tab-btn .job-icon,.member-chip .job-icon{margin-right:2px}
+
+/* ============================================================
+   BUTTONS (touch-safe sizing — ไม่รวมปุ่มเล็กใน table)
+   ============================================================ */
+#sidebar button,
+#mobile-bar button,
+#modal-content button,
+#login-container button,
+form button[type="submit"],
+.tab-btn{
+  min-height:44px;
+}
+
+/* ============================================================
+   INPUT FIELDS (mobile-friendly sizing)
+   ============================================================ */
+input[type="text"],
+input[type="password"],
+input[type="date"],
+input[type="search"],
+select,
+textarea{
+  min-height:48px;
+  font-size:16px!important;  /* ป้องกัน iOS zoom เมื่อกด input */
+}
+
+/* ============================================================
+   MODAL (mobile-safe)
+   ============================================================ */
+#modal-content{
+  max-height:calc(100vh - 40px);
+  max-height:calc(100dvh - 40px);
+}
+
+/* ============================================================
+   DARK MODE
+   ============================================================ */
+html.dark body{background:#0f172a;color:#e2e8f0}
+html.dark .card{background:#1e293b!important;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+html.dark .party-box{border-color:#334155;background:#1a2744}
+html.dark .party-box.full{border-color:#22c55e!important;background:#052e16!important}
+html.dark .drag-over{background:#1e3a5f!important}
+html.dark .tab-btn:not(.active){color:#94a3b8}
+html.dark .tab-btn:not(.active):hover{background:#334155}
+html.dark ::-webkit-scrollbar-track{background:#1e293b}
+html.dark ::-webkit-scrollbar-thumb{background:#475569}
+html.dark .bg-white{background-color:#1e293b!important}
+html.dark .bg-slate-50{background-color:#162032!important}
+html.dark .bg-slate-100{background-color:#0f172a!important}
+html.dark .bg-slate-200{background-color:#1e293b!important}
+html.dark .text-slate-800{color:#e2e8f0!important}
+html.dark .text-slate-700{color:#cbd5e1!important}
+html.dark .text-slate-600{color:#94a3b8!important}
+html.dark .text-slate-500{color:#64748b!important}
+html.dark .border-slate-200{border-color:#334155!important}
+html.dark .border-slate-100{border-color:#1e293b!important}
+html.dark input,html.dark textarea,html.dark select{background:#0f172a!important;color:#e2e8f0!important;border-color:#334155!important}
+html.dark thead tr{background:#0f172a!important}
+html.dark tbody tr:hover{background:#162032!important}
+html.dark .bg-green-50{background-color:#052e16!important}
+html.dark .bg-blue-50{background-color:#0c1a2e!important}
+html.dark .bg-yellow-50{background-color:#1c1204!important}
+html.dark .bg-red-50{background-color:#1c0606!important}
+html.dark .bg-orange-50{background-color:#1c0d04!important}
+html.dark .bg-purple-50{background-color:#1a0c2e!important}
+html.dark #modal-content{background-color:#1e293b!important}
+html.dark #login-container{background-color:#0f172a!important}
+html.dark #login-container>div{background-color:#1e293b!important}
+html.dark .member-chip{opacity:.9}
+html.dark .job-icon{border-color:rgba(255,255,255,.15)}
+
+/* Emp party box (amber theme) */
+.emp-party{border:2px dashed #fbbf24;background:#fffbeb}
+html.dark .emp-party{background:#1f1500!important;border-color:#92400e!important}
+
+/* Member chips inside party boxes */
+html.dark .party-member{background:rgba(255,255,255,0.1)!important}
+html.dark .party-member .pmt{filter:brightness(2.2) saturate(0.8)}
+
+/* Extra dark mode color fixes */
+html.dark .bg-amber-50{background-color:#1f1500!important}
+html.dark .bg-amber-100{background-color:#2a1a00!important}
+html.dark .text-amber-800{color:#fbbf24!important}
+html.dark .text-amber-700{color:#f59e0b!important}
+html.dark .text-yellow-700{color:#fbbf24!important}
+html.dark .text-red-700{color:#f87171!important}
+html.dark .text-orange-700{color:#fb923c!important}
+html.dark .text-green-700{color:#4ade80!important}
+html.dark .text-blue-700{color:#60a5fa!important}
+html.dark .border-yellow-200{border-color:#92400e!important}
+html.dark .border-blue-200{border-color:#1e3a5f!important}
+html.dark .border-amber-200{border-color:#92400e!important}
+html.dark .border-slate-300{border-color:#334155!important}
+
+/* Job label in check-in cards */
+html.dark .job-label{opacity:1!important;filter:brightness(2.4) saturate(0.75)}
