@@ -82,7 +82,8 @@
         </div>
         <nav class="flex-1 p-2 space-y-0.5 mt-1 overflow-y-auto">
           <div class="nav-link active" onclick="showView('dashboard')" id="nav-dashboard">
-            <span>🏠</span><span>Dashboard</span></div>
+            <span>🏠</span><span>Dashboard</span>
+          </div>
           <div class="nav-link" onclick="showView('calendar')" id="nav-calendar"><span>📅</span><span>ปฏิทิน
               Event</span></div>
           <div class="border-t border-white/5 my-2 mx-1"></div>
@@ -788,7 +789,7 @@
             <div class="text-xs font-semibold truncate">${m.name}</div>
             <div class="job-label text-xs opacity-60 truncate" style="color:${ji.color}">${m.job}</div>
           </div>
-          <span class="flex-shrink-0 text-sm">${badge}</span>
+          <span class="flex-shrink-0 text-sm">${badge || (status === 'yes' ? '✅' : status === 'no' ? '❌' : '')}</span>
         </div>`;
       }).join('')}
     </div>
